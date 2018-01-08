@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,67 +14,40 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class MainActivity extends Activity implements View.OnClickListener{
 
-    public static String LOG_TAG = "my_log";
     public String resultJson = "";
-    public String jsonStr = "";
+    public static String jsonStr = "";
     InputStream inputStream;
     public String FILENAME = "jsonmytest";
-
-    Button btnXML;
-    Button btnJSON;
-    TextView tvData;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        tvData = (TextView) findViewById(R.id.txtData);
-        btnXML = (Button) findViewById(R.id.btnXML);
-        btnXML.setOnClickListener(this);
-        btnJSON = (Button) findViewById(R.id.btnJSON);
-        btnJSON.setOnClickListener(this);
 
-        //      new MyService().someTaskOne();
-
+        jsonStr = readFile();
         //делаем проверку на наличие локальной базы
-        if (readFile() == null){
+        if (jsonStr == null){
             //если базы нету, скачиваем ее и сохраняем
+
+
             new GetTask().execute();
             new GetTask().onPostExecute(jsonStr);
         }
+
     }
 
     public void onStart() {
-
-
-
-
         super.onStart();
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnJSON:
-//        resultJson = new JSONFile().examineJSONFile(is);
-//        resultJson = new JSONFile().examineJSONFile(new MyService().someTask());
-    //            new GetTask().execute();
-                resultJson = new JSONFile().examineJSONString(readFile());
-                tvData.setText(resultJson);
-                break;
-            case R.id.btnXML:
-    //            new GetTask().execute();
-    //            new MyService().someTaskOne();
-    //            jsonStr = new MyService().someTask();
-                tvData.setText(readFile());
-    //            tvData.setText(new MyService().someTask());
-                break;
-        }
-
     }
 
     private class GetTask extends AsyncTask<Void, Void, String> {
@@ -151,5 +122,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
             e.printStackTrace();
         }
         return str;
+    }
+
+    public ArrayList demo (){
+        ArrayList demoFile = new JSONFile().examineJSONDemoString(jsonStr);
+        return demoFile;
     }
 }
