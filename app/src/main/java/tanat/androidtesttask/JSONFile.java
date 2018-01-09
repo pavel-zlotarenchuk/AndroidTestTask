@@ -75,6 +75,7 @@ public class JSONFile {
         }
     }*/
 
+    //метод что б распарсить 5 значений
     public ArrayList examineJSONDemoString(String jsontext){
         jsomString = jsontext;
         ArrayList demoData = new ArrayList();
@@ -108,12 +109,14 @@ public class JSONFile {
         }
         catch (Exception je)
         {
+            demoData.add("false");
+            demoData.add(jsomString);
         }
         return demoData;
     }
 
     //метод что б распарсить строку
-        public String examineJSONString(int sch){
+    public String examineJSONString(int sch){
             String x = "";
         try
         {

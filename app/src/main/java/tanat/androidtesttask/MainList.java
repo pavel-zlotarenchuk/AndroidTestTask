@@ -1,16 +1,21 @@
 package tanat.androidtesttask;
 
+import android.app.DialogFragment;
 import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -18,32 +23,62 @@ import java.util.ArrayList;
 public class MainList extends ListFragment implements SwipeRefreshLayout.OnRefreshListener{
 
     SwipeRefreshLayout mSwipeRefreshLayout;
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState){
-        //загружаем список
-        ArrayList data = new MainActivity().demo();
-
-        //создаем лист фрагментов
-        super.onActivityCreated(savedInstanceState);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, data);
-        setListAdapter(adapter);
-    }
+    ArrayList data;
+    DialogFragment dialogFragment;
+    View view;
+    TextView textViewError;
+    Button refreshButton;
+    ArrayAdapter<String> adapter;
 
     //подключаем мой фрагмент
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item, null);
-//        view.setOnTouchListener(this);
+        view = inflater.inflate(R.layout.fragment_item, null);
+
+        dialogFragment = new MyDialog();
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh);
         mSwipeRefreshLayout.setOnRefreshListener(this);
+
+        textViewError = (TextView) view.findViewById(R.id.textViewError);
+        refreshButton = (Button) view.findViewById(R.id.refreshButton);
+
         return view;
     }
 
-    //вешаем слушатель на нажатие фрагмента
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+
+
+
+ //       data = new MainActivity().demo();
+
+/*        if (data.get(0).toString().equals("false")){
+            textViewError.setText(data.get(1).toString());
+            data = null;
+        } else {
+            //создаем лист фрагментов
+            adapter = new ArrayAdapter<String>(getActivity(),
+                    android.R.layout.simple_list_item_1, data);
+            setListAdapter(adapter);
+        }*/
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onStart() {
+
+        onRefresh();
+        super.onStart();
+    }
+
+    public void onResume() {
+
+        super.onResume();
+    }
+
+    //вешаем слушатель на нажатие итема фрагмента
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
@@ -58,20 +93,36 @@ public class MainList extends ListFragment implements SwipeRefreshLayout.OnRefre
         startActivity(intent);
     }
 
+    //свайп вниз для обновления
     @Override
     public void onRefresh() {
-        // говорим о том, что собираемся начать
-        Toast.makeText(getActivity(), "Обновляем", Toast.LENGTH_SHORT).show();
+        // вызываем загрузку данных
+        data = new MainActivity().demo();
+        // создаем список
+        createdList();
         // начинаем показывать прогресс
-        mSwipeRefreshLayout.setRefreshing(true);
-        // ждем 3 секунды и прячем прогресс
+        mSwipeRefreshLayout.setRefreshing(false);
+        dialogFragment.show(getFragmentManager(), "");
+        // прячем прогресс
         mSwipeRefreshLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mSwipeRefreshLayout.setRefreshing(false);
-                // говорим о том, что собираемся закончить
-                Toast.makeText(getActivity(),"обновили", Toast.LENGTH_SHORT).show();
+                //mSwipeRefreshLayout.setRefreshing(false);
+                dialogFragment.dismiss();
             }
-        }, 3000);
+        }, 300);
     }
+
+    //кнопка для обновления в случае ошибки
+    public void onClickRefresh(View v){
+        onRefresh();
+    }
+
+    //создание списка
+    public void createdList(){
+        adapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_list_item_1, data);
+        setListAdapter(adapter);
+    }
+
 }

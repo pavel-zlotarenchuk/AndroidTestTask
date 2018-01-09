@@ -30,11 +30,13 @@ public class MyService extends Service {
     }
 
     protected String someTask() {
-        return strJson;
-    }
-
-    protected void someTaskOne() {
         new GetTask().execute();
+        try {
+            Thread.sleep(400);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return strJson;
     }
 
     private class GetTask extends AsyncTask<Void, Void, String> {
@@ -69,20 +71,18 @@ public class MyService extends Service {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                strJson += e.getMessage();
+                strJson = e.getMessage();
             }
 
             return strJson;
         }
 
-        @Override
-
+/*        @Override
         protected void onPostExecute(String answer) {
             //здесь сохраняем строку json в файл
             try {
                 // отрываем поток для записи
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                        openFileOutput(FILENAME, MODE_PRIVATE)));
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(FILENAME, MODE_PRIVATE)));
                 // пишем данные
                 bw.write(answer);
                 // закрываем поток
@@ -92,7 +92,7 @@ public class MyService extends Service {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     /*    protected String someTask() {
