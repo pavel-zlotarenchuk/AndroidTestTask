@@ -31,7 +31,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         // записываем локальную строку json в переменную
         jsonStr = readFile();
         //делаем проверку на наличие локальной базы
-        if (jsonStr == null){
+        if (jsonStr == null || jsonStr.equals("")){
            loadData();
         }
     }
