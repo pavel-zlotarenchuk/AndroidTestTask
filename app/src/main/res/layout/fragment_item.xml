@@ -1,62 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="7dp"
-        android:text="@string/number_list"
-        android:textColor="@android:color/black"
-        android:textSize="16sp"></TextView>
-
-    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/refresh"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:context="tanat.androidtesttask.MainActivity">
+        android:layout_height="match_parent">
 
-        <ListView
-            android:id="@id/android:list"
+        <LinearLayout
+            android:id="@+id/standart_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="-10dp"
-            android:layout_marginRight="-10dp"
-            android:padding="0dp">
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:layout_marginStart="7dp"
+                android:text="@string/number_list"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:visibility="visible"></TextView>
+
+            <TextView
+                android:id="@+id/android:empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center_horizontal|center"
+                android:text="@string/empty"></TextView>
+
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:id="@+id/refresh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="tanat.androidtesttask.MainActivity">
+
+                <ListView
+                    android:id="@id/android:list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="-10dp"
+                    android:layout_marginRight="-10dp"
+                    android:padding="0dp">
 
 
-        </ListView>
+                </ListView>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+            </android.support.v4.widget.SwipeRefreshLayout>
+        </LinearLayout>
 
-
-
-    <LinearLayout
-        android:id="@id/android:empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/textViewError"
+        <LinearLayout
+            android:id="@+id/error_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="@string/empty"></TextView>
+            android:orientation="vertical"
+            android:visibility="invisible">
 
-        <Button
-            android:id="@+id/refreshButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onClickRefresh"
-            android:text="@string/refreshButton">
-        </Button>
+            <TextView
+                android:id="@+id/textViewError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:width="0dp"
+                android:gravity="fill_vertical|center"
+                android:paddingTop="0dp"
+                android:text="@string/error_text" />
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/refreshButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:width="0dp"
+                android:gravity="center"
+                android:text="@string/refreshButton" />
+        </LinearLayout>
+
+    </FrameLayout>
+
 
 </LinearLayout>
 <!--

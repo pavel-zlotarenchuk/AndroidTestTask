@@ -14,8 +14,13 @@ import java.util.ArrayList;
 
 public class MainActivity extends Activity implements View.OnClickListener{
 
+    // переменная в которую будем записывать json - строку (или ошибку загрузки, если такая есть)
     public static String jsonStr = "";
+    // переменная в которой записано название файла что представляет собой локальную строку json
+    // или локальную базу
     public String FILENAME = "jsonmytest";
+    // переменная в которую будем записывать сколько раз загружали данные в ListFragment
+    public static int numberOfDownloads = 0;
 
     /** Called when the activity is first created. */
     @Override
@@ -23,6 +28,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // записываем локальную строку json в переменную
         jsonStr = readFile();
         //делаем проверку на наличие локальной базы
         if (jsonStr == null){
@@ -31,50 +37,25 @@ public class MainActivity extends Activity implements View.OnClickListener{
     }
 
     public void onStart() {
-        //сохраняем локальную базу
-        write(jsonStr);
         super.onStart();
     }
 
+    public void onPause() {
+        //сохраняем локальную базу
+        write(jsonStr);
+        super.onPause();
+    }
+
+    // мктод для загрузки базы
     public void loadData(){
-        //скачиваем базу
         jsonStr = new MyService().someTask();
      }
-
-/*    @Override // Здесь вы создаете все диалоги
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case DIALOG_LOAD_KEY: {
-                final ProgressDialog dialog = new ProgressDialog(this);
-                dialog.setMessage("Загрузка, подождите пожалуйста...");
-                dialog.setCancelable(true);
-                dialog.show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        loadData(); // Вызов вашей функции загрузки
-                        // Удаление диалога после загрузки
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialog.dismiss();
-                            }
-                        });
-
-                    }
-
-                }).start();
-                return dialog;
-            }
-        }
-        return super.onCreateDialog(id);
-    }*/
 
     @Override
     public void onClick(View v) {
     }
 
+    // метод для чтения строки json из файла
     public String readFile() {
         String str = "";
         try {
@@ -90,8 +71,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
         return str;
     }
 
+    //метод для сохранение строки json в файл (создание локальной базы)
     protected void write(String answer) {
-            //здесь сохраняем строку json в файл
         try {
             // отрываем поток для записи
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(FILENAME, MODE_PRIVATE)));
@@ -107,69 +88,14 @@ public class MainActivity extends Activity implements View.OnClickListener{
     }
 
     public ArrayList demo (){
-
-
-
-        loadData();
+        // проверяем загружали ли данные в список раньше
+        if (numberOfDownloads > 0){
+            // обновляем данные
+            loadData();
+        }
+        // иначе увеличиваем количество загрузок на 1 и передаем в ListFragment
+        numberOfDownloads++;
         ArrayList demoFile = new JSONFile().examineJSONDemoString(jsonStr);
         return demoFile;
     }
-
-/*    private class GetTask extends AsyncTask<Void, Void, String> {
-
-        @Override
-        protected String doInBackground(Void... params) {
-
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            // получаем данные с внешнего ресурса и переделываем в строку
-            try {
-                URL url = new URL("http://projects.gmoby.org/web/index.php/api/trips?from_date=2016-01-01&to_date=2018-03-01");
-
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                //                   inputStream = urlConnection.getInputStream();
-                inputStream = url.openConnection().getInputStream();
-
-                StringBuffer buffer = new StringBuffer();
-
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line);
-                }
-
-                jsonStr = buffer.toString();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                jsonStr += e.getMessage();
-            }
-
-            return jsonStr;
-        }
-
-        @Override
-
-        protected void onPostExecute(String answer) {
-            //здесь сохраняем строку json в файл
-            try {
-                // отрываем поток для записи
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                        openFileOutput(FILENAME, MODE_PRIVATE)));
-                // пишем данные
-                bw.write(answer);
-                // закрываем поток
-                bw.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }*/
 }

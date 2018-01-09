@@ -7,13 +7,8 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -32,7 +27,7 @@ public class MyService extends Service {
     protected String someTask() {
         new GetTask().execute();
         try {
-            Thread.sleep(400);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -55,11 +50,8 @@ public class MyService extends Service {
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
 
-                //                   inputStream = urlConnection.getInputStream();
                 inputStream = url.openConnection().getInputStream();
-
                 StringBuffer buffer = new StringBuffer();
-
                 reader = new BufferedReader(new InputStreamReader(inputStream));
 
                 String line;
@@ -68,68 +60,12 @@ public class MyService extends Service {
                 }
 
                 strJson = buffer.toString();
-
             } catch (Exception e) {
                 e.printStackTrace();
                 strJson = e.getMessage();
             }
-
             return strJson;
         }
-
-/*        @Override
-        protected void onPostExecute(String answer) {
-            //здесь сохраняем строку json в файл
-            try {
-                // отрываем поток для записи
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(FILENAME, MODE_PRIVATE)));
-                // пишем данные
-                bw.write(answer);
-                // закрываем поток
-                bw.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }*/
     }
-
-    /*    protected String someTask() {
-        HttpsURLConnection urlConnection = null;
-        BufferedReader reader = null;
-        String strJson = "";
-
-
-        // получаем данные с внешнего ресурса
-        try {
-            URL url = new URL("https://api.androidhive.info/feed/feed.json");
-
-            urlConnection = (HttpsURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-//            int str = urlConnection.getResponseCode();
-
-            InputStream inputStream = urlConnection.getInputStream();
-//            InputStream inputStream = url.openConnection().getInputStream();
-
-
-            StringBuffer buffer = new StringBuffer();
-
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line);
-            }
-
-            strJson = buffer.toString();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            strJson += e.getMessage();
-        }
-        return strJson;
-    }*/
-    }
+}
 

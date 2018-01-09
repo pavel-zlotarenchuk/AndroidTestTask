@@ -13,7 +13,6 @@ public class InfoRoutFragment extends Fragment {
     TextView textView;
 
     public InfoRoutFragment() {
-        // Required empty public constructor
     }
 
 
@@ -37,5 +36,4 @@ public class InfoRoutFragment extends Fragment {
             textView.setText(data);
         }
     }
-
 }

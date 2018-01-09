@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+/*класс что создает кастомный диалог прогрес*/
 
 public class MyDialog extends DialogFragment {
 
@@ -16,10 +17,6 @@ public class MyDialog extends DialogFragment {
         View v = inflater.inflate(R.layout.dialog, null);
 
         return v;
-    }
-
-    public void close (){
-        dismiss();
     }
 
     public void onDismiss(DialogInterface dialog) {
