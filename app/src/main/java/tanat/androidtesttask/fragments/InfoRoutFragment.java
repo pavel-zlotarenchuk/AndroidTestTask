@@ -1,4 +1,4 @@
-package tanat.androidtesttask;
+package tanat.androidtesttask.fragments;
 
 
 import android.os.Bundle;
@@ -8,21 +8,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import tanat.androidtesttask.R;
+
 public class InfoRoutFragment extends Fragment {
 
-    TextView textView;
-
-    public InfoRoutFragment() {
-    }
-
+    private TextView infoTextView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_info_rout, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_info_rout, container, false);
 
-        textView = (TextView) view.findViewById(R.id.infoTextView);
-        return view;
+        infoTextView = (TextView) rootView.findViewById(R.id.infoTextView);
+        return rootView;
     }
 
     @Override
@@ -33,7 +31,7 @@ public class InfoRoutFragment extends Fragment {
         if (getArguments() != null) {
             //добавляем данные в TextViev
             String data = getArguments().getString("data");
-            textView.setText(data);
+            infoTextView.setText(data);
         }
     }
 }

@@ -15,7 +15,7 @@
 
     <fragment
         android:id="@+id/listFragment"
-        android:name="tanat.androidtesttask.MainList"
+        android:name="tanat.androidtesttask.fragments.ListFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="0dp"

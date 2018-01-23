@@ -1,4 +1,4 @@
-package tanat.androidtesttask;
+package tanat.androidtesttask.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -6,9 +6,13 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import tanat.androidtesttask.utils.JSONParsing;
+import tanat.androidtesttask.R;
+import tanat.androidtesttask.fragments.InfoRoutFragment;
+
 public class InfoRoutActivity extends AppCompatActivity {
 
-    static String data;
+    private static String data;
 
     @SuppressLint("ResourceType")
     @Override
@@ -16,12 +20,14 @@ public class InfoRoutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info_rout);
 
+        //unload a position from intent
         //выгружаем позицию из интента
         Intent intent = getIntent();
         int route = intent.getIntExtra("position", 0);
 
+        //parse the required element to us
         //распарсиваем нужный нам елемент
-        data = new JSONFile().examineJSONString(route);
+        data = new JSONParsing().examineJSONString(route);
 
         //инициализируем фрагмент и фрагмент-менеджер
         FragmentManager fragmentManager = getSupportFragmentManager();

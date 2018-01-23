@@ -1,4 +1,4 @@
-package tanat.androidtesttask;
+package tanat.androidtesttask.fragments;
 
 import android.app.DialogFragment;
 import android.content.DialogInterface;
@@ -7,9 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import tanat.androidtesttask.R;
+
 /*класс что создает кастомный диалог прогрес*/
 
-public class MyDialog extends DialogFragment {
+public class AlterDialog extends DialogFragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

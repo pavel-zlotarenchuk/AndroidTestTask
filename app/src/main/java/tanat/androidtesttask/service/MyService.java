@@ -1,4 +1,4 @@
-package tanat.androidtesttask;
+package tanat.androidtesttask.service;
 
 import android.app.Service;
 import android.content.Intent;
@@ -14,9 +14,9 @@ import java.net.URL;
 
 public class MyService extends Service {
 
-    static String strJson = "";
-    InputStream inputStream;
-    public String FILENAME = "jsonmytest";
+    private static String strJson = "";
+    private InputStream inputStream;
+    private String FILENAME = "jsonmytest";
 
     @Nullable
     @Override
@@ -24,7 +24,7 @@ public class MyService extends Service {
         return null;
     }
 
-    protected String someTask() {
+    public String someTask() {
         new GetTask().execute();
         try {
             Thread.sleep(500);

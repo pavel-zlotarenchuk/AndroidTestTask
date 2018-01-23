@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="tanat.androidtesttask.InfoRoutActivity">
+    tools:context="tanat.androidtesttask.activity.InfoRoutActivity">
 
     <fragment
         android:id="@+id/fragmentInfo"
-        android:name="tanat.androidtesttask.InfoRoutFragment"
+        android:name="tanat.androidtesttask.fragments.InfoRoutFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        class="tanat.androidtesttask.InfoRoutFragment" />
+        class="tanat.androidtesttask.fragments.InfoRoutFragment" />
 
 </android.support.constraint.ConstraintLayout>
