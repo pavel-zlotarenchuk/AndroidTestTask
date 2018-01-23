@@ -1,10 +1,8 @@
 package tanat.androidtesttask.service;
 
+import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -13,68 +11,43 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 
-public class ConectService extends Service {
+import tanat.androidtesttask.activity.MainActivity;
 
-    final String LOG_TAG = "MyLog";
-    private static Context context;
+/**
+ * Created by TaNaT on 23.01.2018.
+ */
+
+public class TestService extends Service {
+
+    final String LOG_TAG = "myLogs";
 
     @Override
     public IBinder onBind(Intent intent) {
-        return binder;
+        return null;
     }
 
-    public void onCreate() {
-        super.onCreate();
-        Log.d(LOG_TAG, "onCreate");
-    }
-
-    private final IBinder binder = new LocalBinder();
-    private static String inetJsonStr = "";
+    ExecutorService executorService;
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(LOG_TAG, "onStartCommand");
-        someTask();
+        Log.d(LOG_TAG, "MyService onStartCommand");
+
+        PendingIntent pendingIntent = intent.getParcelableExtra(MainActivity.PARAM_PINTENT);
+        LoadRun loadRun = new LoadRun();
+        executorService.execute(loadRun);
+
         return super.onStartCommand(intent, flags, startId);
     }
 
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG, "onDestroy");
-    }
+    class LoadRun implements Runnable {
+        PendingIntent pendingIntent;
 
-    public void someTask() {
-        GetTask getTask = new GetTask();
-        getTask.execute();
-        try {
-            inetJsonStr = getTask.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
+        public void run() {
 
-    public String getInetJsonStr() {
-        if (inetJsonStr.equals("")){
+            Log.d(LOG_TAG, "LoadRun#");
 
-            return null;
-        } else {
-            return inetJsonStr;
-        }
-    }
-
-    public class LocalBinder extends Binder {
-        public ConectService getService() {
-            return ConectService.this;
-        }
-    }
-
-    private class GetTask extends AsyncTask<Void, Void, String> {
-
-        @Override
-        protected String doInBackground(Void... params) {
+            // начинаем выполнение задачи
             String strJson = "";
             InputStream inputStream;
 
@@ -97,15 +70,20 @@ public class ConectService extends Service {
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line);
                 }
-                Log.d(LOG_TAG, "strJson not null");
+
                 strJson = buffer.toString();
             } catch (Exception e) {
                 e.printStackTrace();
                 strJson = e.getMessage();
-                Log.d(LOG_TAG, strJson);
             }
 
-            return strJson;
+            // сообщаем об окончании задачи
+            Intent intent = new Intent().putExtra(MainActivity.PARAM_RESULT, strJson);
+            try {
+                pendingIntent.send(TestService.this, MainActivity.STATUS_FINISH, intent);
+            } catch (PendingIntent.CanceledException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

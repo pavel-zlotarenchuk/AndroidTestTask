@@ -1,121 +1,114 @@
 package tanat.androidtesttask.activity;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.app.ListFragment;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-
+import tanat.androidtesttask.fragments.AlterDialog;
 import tanat.androidtesttask.service.ConectService;
+import tanat.androidtesttask.service.TestService;
 import tanat.androidtesttask.utils.JSONParsing;
 import tanat.androidtesttask.service.MyService;
 import tanat.androidtesttask.R;
 import tanat.androidtesttask.utils.LoadAllData;
-import tanat.androidtesttask.utils.LoadLocalData;
 
 public class MainActivity extends Activity {
+    public final static int STATUS_START = 100;
+    public final static int STATUS_FINISH = 200;
+    public final static String PARAM_STATUS = "status";
+    public final static String PARAM_RESULT = "result";
+    public final static String PARAM_PINTENT = "pendingIntent";
+
+    final static String LOG_TAG = "MyLog";
 
     // переменная в которую будем записывать json - строку (или ошибку загрузки, если такая есть)
     private static String jsonStr = "";
-    LoadLocalData loadLocalData;
-    LoadAllData loadAllData;
 
-    /** Called when the activity is first created. */
+    private boolean bound = false;
+    private static ServiceConnection sConn;
+    private Intent intent;
+    private static ConectService conectService;
+
+    FragmentTransaction fragmentTransaction;
+
+    /** erstsrgsrgf. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        loadAllData = new LoadAllData(this);
-        jsonStr = loadAllData.loadLocalData(this);
-//        loadLocalData = new LoadLocalData(this);
-        // записываем локальную строку json в переменную
-//        jsonStr = loadLocalData.readFile();
-  //      jsonStr = readFile();
-        //делаем проверку на наличие локальной базы
-        if (jsonStr == null || jsonStr.equals("")){
-           loadData();
-        }
+
+        intent = new Intent(this, ConectService.class);
+        sConn = new ServiceConnection() {
+            public void onServiceConnected(ComponentName name, IBinder binder) {
+                Log.d(LOG_TAG, "MainActivity onServiceConnected");
+                conectService = ((ConectService.LocalBinder) binder).getService();
+                bound = true;
+            }
+
+            public void onServiceDisconnected(ComponentName name) {
+                Log.d(LOG_TAG, "MainActivity onServiceDisconnected");
+                bound = false;
+            }
+        };
+
+        bindService(intent, sConn, 0);
+        startService(intent);
 
 
-        startService(new Intent(this, ConectService.class));
+/*        AlterDialog alterDialog = new AlterDialog();
+        fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.listFragment, alterDialog);
+        fragmentTransaction.commit();*/
+
+/*        PendingIntent pendingIntent;
+        Intent intent;
+
+        pendingIntent = createPendingResult(0, null, 0);
+        intent = new Intent(this, TestService.class).putExtra(PARAM_PINTENT, pendingIntent);
+        startService(intent);*/
     }
 
 /*    @Override
-    protected void onStart() {
-        super.onStart();
-        // Bind to LocalService
-        Intent intent = new Intent(this, LocalService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+            if (resultCode == STATUS_FINISH) {
+                jsonStr = data.getStringExtra(PARAM_RESULT);
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        // Unbind from the service
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
-    }*/
+                ListFragment listFragment = new ListFragment();
+                fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.add(R.id.listFragment, listFragment);
+                fragmentTransaction.commit();
+            }
+        }*/
+
+
 
     public void onPause() {
-        loadAllData.pullLocalData(this, jsonStr);
-//        loadLocalData.writeFile(jsonStr);
         //сохраняем локальную базу
-   //     write(jsonStr);
+        LoadAllData loadAllData = new LoadAllData(this);
+        loadAllData.pullLocalData(this, jsonStr);
         super.onPause();
     }
 
     // мктод для загрузки базы
-    public void loadData(){
-        jsonStr = new MyService().someTask();
+    public static String loadData(){
+ //      jsonStr = new MyService().someTask();
+        Log.d(LOG_TAG, "loadData");
+        jsonStr = conectService.getInetJsonStr();
+        return jsonStr;
      }
 
-    // переменная в которой записано название файла что представляет собой локальную строку json
-    // или локальную базу
-    private String FILENAME = "jsonmytest";
-
-    // метод для чтения строки json из файла
-    public String readFile() {
-        String str = "";
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(FILENAME));
-            // открываем поток для чтения
-     //       BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput(FILENAME)));
-            // читаем содержимое
-            str = br.readLine();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return str;
-    }
-
-    //метод для сохранение строки json в файл (создание локальной базы)
-    protected void write(String answer) {
-        try {
-            // отрываем поток для записи
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(FILENAME, MODE_PRIVATE)));
-            // пишем данные
-            bw.write(answer);
-            // закрываем поток
-            bw.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    // переменная в которую будем записывать сколько раз загружали данные в ListFragment
+/*    // переменная в которую будем записывать сколько раз загружали данные в ListFragment
     private static int numberOfDownloads = 0;
 
     public ArrayList demo (){
@@ -128,11 +121,14 @@ public class MainActivity extends Activity {
         numberOfDownloads++;
         ArrayList demoFile = new JSONParsing().examineJSONDemoString(jsonStr);
         return demoFile;
-    }
+    }*/
 
+    public void onStop () {
+        if (!bound) return;
+        unbindService(sConn);
+        bound = false;
 
-    public void onDestroy () {
-        super.onDestroy();
-        stopService(new Intent(this, ConectService.class));
+        stopService(intent);
+        super.onStop();
     }
 }

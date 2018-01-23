@@ -15,7 +15,6 @@ public class AlterDialog extends DialogFragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        getDialog().setTitle("");
         View v = inflater.inflate(R.layout.dialog, null);
 
         return v;

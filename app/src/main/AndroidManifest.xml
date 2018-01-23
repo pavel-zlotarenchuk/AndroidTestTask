@@ -22,9 +22,22 @@
         </activity>
 
         <service
+            android:name=".service.ConectService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
+
+        <service
             android:name=".service.MyService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true">
+        </service>
+
+        <service
+            android:name=".service.TestService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
 
         <activity android:name=".activity.InfoRoutActivity"></activity>
     </application>

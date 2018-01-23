@@ -1,6 +1,7 @@
 package tanat.androidtesttask.fragments;
 
 import android.app.DialogFragment;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -29,13 +30,12 @@ import tanat.androidtesttask.activity.InfoRoutActivity;
 import tanat.androidtesttask.activity.MainActivity;
 import tanat.androidtesttask.R;
 import tanat.androidtesttask.service.ConectService;
+import tanat.androidtesttask.service.TestService;
 import tanat.androidtesttask.utils.LoadAllData;
 
 public class ListFragment extends android.app.ListFragment implements SwipeRefreshLayout.OnRefreshListener{
 
-    //
     // unbilder для роботы butterknife с фрагментом
-    // private Unbinder unbinder;
 
     private View rootView;
     private DialogFragment dialogFragment;
@@ -51,11 +51,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         onRefresh();
     }
 
-    boolean bound = false;
-    ServiceConnection serviceConnection;
-    Intent intent;
-    ConectService conectService;
-
     //подключаем мой фрагмент
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,19 +61,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         dialogFragment = new AlterDialog();
         swipeRefreshLayout.setOnRefreshListener(this);
 
-/*        intent = new Intent(getActivity(), ConectService.class);
-        conectService = new ConectService() {
-
-            public void onServiceConnected(ComponentName name, IBinder binder) {
-                conectService = ((LocalBinder) binder).getService();
-                bound = true;
-            }
-
-            public void onServiceDisconnected(ComponentName name) {
-                bound = false;
-            }
-        };*/
-
         return rootView;
     }
 
@@ -87,10 +69,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     @Override
     public void onStart() {
         super.onStart();
-//        conectService.bindService(intent, serviceConnection, 0);
-
-
-
         onRefresh();
     }
 
@@ -109,9 +87,12 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         startActivity(intent);
     }
 
+    int numberOfDownloads = 0;
+
     //свайп вниз для обновления
     @Override
     public void onRefresh() {
+
         /* есть две реализации диалога прогреса,
          * одна представлена возможностями класса  SwipeRefreshLayout, являеться стандартной
          * вторая создана с помощью DialogFragment*/
@@ -125,9 +106,12 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     //    dialogFragment.show(getFragmentManager(), "");
 
         // вызываем загрузку данных
-        data = new MainActivity().demo();
-   //     LoadAllData loadAllData = new LoadAllData(getActivity());
-   //     data = loadAllData.loadDemoData(getActivity(), 0);
+//     data = new MainActivity().demo();
+
+        LoadAllData loadAllData = new LoadAllData(getActivity());
+        data = loadAllData.loadDemoData(getActivity(), numberOfDownloads);
+
+        numberOfDownloads++;
 
         if(data.size() > 0){
             // данные для списка есть
@@ -172,14 +156,5 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         adapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_list_item_1, data);
         setListAdapter(adapter);
-    }
-
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (!bound) return;
-        conectService.unbindService(serviceConnection);
-        bound = false;
     }
 }

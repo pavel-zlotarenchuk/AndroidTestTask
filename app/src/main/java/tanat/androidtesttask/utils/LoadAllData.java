@@ -10,6 +10,7 @@ import android.util.Log;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+import tanat.androidtesttask.activity.MainActivity;
 import tanat.androidtesttask.service.ConectService;
 
 public class LoadAllData {
@@ -22,27 +23,31 @@ public class LoadAllData {
 
     private static String jsonStr = "";
 
-    public void loadStringData (Context context){
-
+    public String loadStringData (Context context){
+        String jsonStr = "";
         jsonStr = loadLocalData(context);
 
         if (jsonStr == null || jsonStr.equals("")){
-            jsonStr = loadInetData(context);
+    //        jsonStr = loadInetData(context);
         }
+
+        return jsonStr;
     }
 
     public ArrayList loadDemoData (Context context, int numberOfDownloads){
-        ArrayList demoData = null;
+        String jsonStr = "";
 
-        // проверяем загружали ли данные в список раньше
-        if (numberOfDownloads == 0){
-            loadStringData(context);
+        if (numberOfDownloads == 0) {
+            jsonStr = loadLocalData(context);
+            //делаем проверку на наличие локальной базы
+            if (jsonStr == null || jsonStr.equals("")) {
+                jsonStr = MainActivity.loadData();
+            }
         } else {
-            // обновляем данные
-            loadInetData(context);
+            jsonStr = MainActivity.loadData();
         }
 
-        ArrayList demoFile = new JSONParsing().examineJSONDemoString(jsonStr);
+        ArrayList demoData = new JSONParsing().examineJSONDemoString(jsonStr);
         return demoData;
     }
 
@@ -58,30 +63,32 @@ public class LoadAllData {
         loadLocalData.writeFile(localJsonStr);
     }
 
-    boolean bound = false;
+/*    boolean bound = false;
     ServiceConnection serviceConnection;
     Intent intent;
     ConectService conectService;
 
-    public String loadInetData (Context context){
+    public void loadInetData (Context context){
         intent = new Intent(context, ConectService.class);
         serviceConnection = new ServiceConnection() {
             public void onServiceConnected(ComponentName name, IBinder binder) {
-                Log.d("MyLog", "MainActivity onServiceConnected");
+                Log.d(LOG_TAG, "MainActivity onServiceConnected");
                 conectService = ((ConectService.LocalBinder) binder).getService();
                 bound = true;
             }
 
             public void onServiceDisconnected(ComponentName name) {
-                Log.d("MyLog", "MainActivity onServiceDisconnected");
+                Log.d(LOG_TAG, "MainActivity onServiceDisconnected");
                 bound = false;
             }
         };
-        conectService.bindService(intent, serviceConnection, 0);
+
+        bindService(intent, serviceConnection, 0);
+//        conectService.startService(intent);
 
         String inetJsonStr = null;
         inetJsonStr = conectService.getInetJsonStr();
 
         return inetJsonStr;
-    }
+    }*/
 }
