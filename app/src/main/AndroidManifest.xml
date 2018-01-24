@@ -22,12 +22,6 @@
         </activity>
 
         <service
-            android:name=".service.ConectService"
-            android:enabled="true"
-            android:exported="true">
-        </service>
-
-        <service
             android:name=".service.BroadcastService"
             android:enabled="true"
             android:exported="true">

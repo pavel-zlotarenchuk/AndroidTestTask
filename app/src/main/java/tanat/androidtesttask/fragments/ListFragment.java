@@ -1,7 +1,5 @@
 package tanat.androidtesttask.fragments;
 
-import android.app.DialogFragment;
-import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -29,39 +27,34 @@ import tanat.androidtesttask.activity.InfoRoutActivity;
 import tanat.androidtesttask.R;
 import tanat.androidtesttask.service.BroadcastService;
 import tanat.androidtesttask.utils.JSONParsing;
-import tanat.androidtesttask.utils.LoadAllData;
+import tanat.androidtesttask.utils.LoadLocalData;
 
 public class ListFragment extends android.app.ListFragment implements SwipeRefreshLayout.OnRefreshListener{
-
-    // unbilder для роботы butterknife с фрагментом
-
-    private View rootView;
-    private DialogFragment dialogFragment;
-
-    final String LOG_TAG = "MyLog";
-    public final static int STATUS_START = 100;
-    public final static int STATUS_FINISH = 200;
-    public final static String PARAM_TIME = "time";
-    public final static String PARAM_TASK = "task";
-    public final static String PARAM_RESULT = "result";
-    public final static String PARAM_STATUS = "status";
-    public final static String BROADCAST_ACTION = "tanat.androidtesttask.activity";
-    BroadcastReceiver broadcastReceiver;
 
     @BindView(R.id.refresh) SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.standart_layout) LinearLayout contentLayout;
     @BindView(R.id.error_layout) LinearLayout errorLayout;
     @BindView(R.id.errorTextView) TextView errorTextView;
 
+    //button to update if an error
     //кнопка для обновления в случае ошибки
     @OnClick(R.id.refreshButton)
     void onRefreshClick() {
         onRefresh();
     }
 
-    String result;
+    private View rootView;
+
+    final String LOG_TAG = "MyLog";
+    private final static int STATUS_START = 100;
+    private final static int STATUS_FINISH = 200;
+    private final static String PARAM_RESULT = "result";
+    private final static String PARAM_STATUS = "status";
+    public final static String BROADCAST_ACTION = "tanat.androidtesttask.activity";
+    private BroadcastReceiver broadcastReceiver;
     private ArrayList data = null;
 
+    //connect my fragment
     //подключаем мой фрагмент
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,7 +62,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         rootView = inflater.inflate(R.layout.fragment_item, null);
         ButterKnife.bind(this, rootView);
 
-        dialogFragment = new AlterDialog();
         swipeRefreshLayout.setOnRefreshListener(this);
 
         intent = new Intent(getActivity(), BroadcastService.class);
@@ -81,15 +73,18 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     Intent intent;
 
     private void setsConnection (){
-        // создаем BroadcastReceiver
+        // create BroadcastReceiver
         broadcastReceiver = new BroadcastReceiver() {
+            // actions when receiving messages
             // действия при получении сообщений
             public void onReceive(Context context, Intent intent) {
                 int status = intent.getIntExtra(PARAM_STATUS, 0);
-                // Ловим сообщения о старте задач
+                // catch messages about the start of task
+                // ловим сообщения о старте задач
                 if (status == STATUS_START) {
                     Log.d(LOG_TAG, "start task");
                 }
+                // catch messages about the finish of task
                 // Ловим сообщения об окончании задач
                 if (status == STATUS_FINISH) {
                     Log.d(LOG_TAG, "finish task");
@@ -98,18 +93,14 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
                 }
             }
         };
+        // create filter BroadcastReceiver
         // создаем фильтр для BroadcastReceiver
         IntentFilter intFilt = new IntentFilter(BROADCAST_ACTION);
 
+        //register BroadcastReceiver
         // регистрируем (включаем) BroadcastReceiver
         getActivity().registerReceiver(broadcastReceiver, intFilt);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        // дерегистрируем (выключаем) BroadcastReceiver
-        getActivity().unregisterReceiver(broadcastReceiver);
+        getActivity().startService(intent);
     }
 
     @Override
@@ -119,6 +110,20 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         procesShowData();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //save data in file
+        loadLocalData.writeFile(new JSONParsing().dispatch());
+
+        //deregister BroadcastReceiver
+        // дерегистрируем (выключаем) BroadcastReceiver
+        getActivity().unregisterReceiver(broadcastReceiver);
+        //stop service
+        getActivity().stopService(intent);
+    }
+
+    //hang the listener on the click of the fragment
     //вешаем слушатель на нажатие итема фрагмента
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -134,124 +139,80 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         startActivity(intent);
     }
 
-    // переменная в которую будем записывать сколько раз загружали данные в ListFragment
-    int numberOfDownloads = 0;
-
+    // swipe down for updates
     //свайп вниз для обновления
     @Override
     public void onRefresh() {
-
-        /* есть две реализации диалога прогреса,
-         * одна представлена возможностями класса  SwipeRefreshLayout, являеться стандартной
-         * вторая создана с помощью DialogFragment*/
-
-        // начинаем показывать прогресс
+        // start show progress dialog
+        // начинаем показывать прогресс диалог
         swipeRefreshLayout.setRefreshing(true);
 
-         /*либо используем наш класс, для этого нужно его раскоментить и заменить true на false в
-         * строке выше 'mSwipeRefreshLayout.setRefreshing(false);' */
- //       dialogFragment.show(getFragmentManager(), "");
-
-        // прячем прогресс
+        // updates data
+        // обновляем данные
         getActivity().startService(intent);
-        swipeRefreshLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // вызываем обновление данных
-
-
-  //            data = new JSONParsing().examineJSONDemoString(result);
-
-/*                if(data != null){
-                    // данные для списка есть
-                    // теперь проверим правильно ли была выполнена сетевая операция
-                    if(data.get(0).toString().equals("false")){
-                        // сетевая операция не прошла
-                        // меняем видимость layout так, что б не было видно рабочего layout и был виден
-                        // layout ошибки и вводим текст ошибки в textView
-                        contentLayout.setVisibility(View.INVISIBLE);
-                        errorLayout.setVisibility(View.VISIBLE);
-                        errorTextView.setText(data.get(1).toString());
-                    } else {
-                        //если сетевая операция прошла успешно
-                        errorLayout.setVisibility(View.INVISIBLE);
-                        contentLayout.setVisibility(View.VISIBLE);
-                        // создаем список
-                        createdList();
-                    }
-                } else {
-                    //если данных списка нету
-                    errorLayout.setVisibility(View.INVISIBLE);
-                    contentLayout.setVisibility(View.VISIBLE);
-                    // создаем список (ListFragment автоматически выведет заданое сообщение)
-                    createdList();
-                }
-
-                swipeRefreshLayout.setRefreshing(false);
-                //либо используем наш класс
-                dialogFragment.dismiss();*/
-            }
-        }, 0);
     }
 
+    LoadLocalData loadLocalData;
+
+    // method for loading data
+    // метод для загрузки данных
     private void loadData (){
-
-/*        LoadAllData loadAllData = new LoadAllData(getActivity());
-        result = loadAllData.loadDemoData(numberOfDownloads);
-        numberOfDownloads++;
-        */
-
+        // start show progress dialog
         swipeRefreshLayout.setRefreshing(true);
-        dialogFragment.show(getFragmentManager(), "");
 
-        LoadAllData loadAllData = new LoadAllData(getActivity());
-        if (numberOfDownloads == 0) {
-            // если нет - загружаем из локального хранилища
-            data = loadAllData.returnArray();
-            //делаем проверку на наличие локальной базы
-            if (data == null || data.size() == 0) {
-                getActivity().startService(intent);
-            }
-        } else {
-            //если загружали данные раньше - обновляем их
+        // upload local data
+        // загрузить локальные данные
+        loadLocalData = new LoadLocalData(getActivity());
+        data = loadLocalData.returnArray();
+
+        //if there is no data, load it from the network
+        //если данных нет - загружаем из сети
+        if (data == null || data.size() == 0) {
             getActivity().startService(intent);
         }
-        numberOfDownloads++;
     }
 
     private void procesShowData (){
         if(data != null){
-            // данные для списка есть
-            // теперь проверим правильно ли была выполнена сетевая операция
+            /* data for the list is
+             * now we will check whether the network operation was performed correctly*/
+            /* данные для списка есть
+             * теперь проверим правильно ли была выполнена сетевая операция*/
             if(data.get(0).toString().equals("false")){
-                // сетевая операция не прошла
-                // меняем видимость layout так, что б не было видно рабочего layout и был виден
-                // layout ошибки и вводим текст ошибки в textView
+                /* network operation failed
+                 * change the visibility layout so that the working layout was not visible and was visible
+                 * error layout and enter the error text in textView*/
+                /* сетевая операция не прошла
+                 * меняем видимость layout так, что б не было видно рабочего layout и был виден
+                 * layout ошибки и вводим текст ошибки в textView */
                 contentLayout.setVisibility(View.INVISIBLE);
                 errorLayout.setVisibility(View.VISIBLE);
                 errorTextView.setText(data.get(1).toString());
             } else {
+                // if network operation true
                 //если сетевая операция прошла успешно
                 errorLayout.setVisibility(View.INVISIBLE);
                 contentLayout.setVisibility(View.VISIBLE);
+                // create list
                 // создаем список
                 createdList();
             }
         } else {
+            // if data is null
             //если данных списка нету
             errorLayout.setVisibility(View.INVISIBLE);
             contentLayout.setVisibility(View.VISIBLE);
+            // create list (ListFragment automatically outputs the specified message)
             // создаем список (ListFragment автоматически выведет заданое сообщение)
             createdList();
         }
 
         swipeRefreshLayout.setRefreshing(false);
-        //либо используем наш класс
-        dialogFragment.dismiss();
     }
 
     private ArrayAdapter<String> adapter;
 
+    // method create list
     // метод создание списка
     public void createdList(){
         if (data != null){
