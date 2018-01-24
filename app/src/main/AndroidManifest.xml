@@ -27,6 +27,12 @@
             android:exported="true">
         </service>
 
+        <service
+            android:name=".service.BroadcastService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
+
         <activity android:name=".activity.InfoRoutActivity"></activity>
     </application>
 

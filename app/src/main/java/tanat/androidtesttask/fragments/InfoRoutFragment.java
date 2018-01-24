@@ -8,18 +8,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import tanat.androidtesttask.R;
 
 public class InfoRoutFragment extends Fragment {
 
-    private TextView infoTextView;
+    @BindView(R.id.infoTextView) TextView infoTextView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_info_rout, container, false);
-
-        infoTextView = (TextView) rootView.findViewById(R.id.infoTextView);
+        ButterKnife.bind(this, rootView);
         return rootView;
     }
 
@@ -27,9 +28,10 @@ public class InfoRoutFragment extends Fragment {
     public void onStart(){
         super.onStart();
 
+        //check for emptiness
         //проверяем на пустоту
         if (getArguments() != null) {
-            //добавляем данные в TextViev
+            //add data in TextViev
             String data = getArguments().getString("data");
             infoTextView.setText(data);
         }

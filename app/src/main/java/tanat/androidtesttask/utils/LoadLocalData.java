@@ -16,18 +16,19 @@ public class LoadLocalData {
         this.context = context;
     }
 
+    // name file local database
     // переменная в которой записано название файла что представляет собой локальную строку json
-    // или локальную базу
     private static String FILENAME = "jsonmytest";
 
+    //method save string in file
     //метод для сохранение строки json в файл (создание локальной базы)
     public void writeFile(String answer) {
         try {
-            // отрываем поток для записи
+            //open the stream for writing (отрываем поток для записи)
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(context.openFileOutput(FILENAME, Context.MODE_PRIVATE)));
-            // пишем данные
+            // writing data (пишем данные)
             bw.write(answer);
-            // закрываем поток
+            // close stream (закрываем поток)
             bw.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -36,13 +37,14 @@ public class LoadLocalData {
         }
     }
 
+    //method read string from a file
     // метод для чтения строки json из файла
     public static String readFile() {
         String str = "";
         try {
-            // открываем поток для чтения
+            //open stream from read (открываем поток для чтения)
             BufferedReader br = new BufferedReader(new InputStreamReader(context.openFileInput(FILENAME)));
-            // читаем содержимое
+            // read file (читаем содержимое)
             str = br.readLine();
         } catch (FileNotFoundException e) {
             e.printStackTrace();

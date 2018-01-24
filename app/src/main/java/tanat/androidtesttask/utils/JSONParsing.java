@@ -62,6 +62,9 @@ public class JSONParsing {
 
     //метод что б распарсить 5 значений
     public ArrayList examineJSONDemoString(String jsontext){
+        if (jsontext == null){
+            return null;
+        }
         jsonString = jsontext;
         ArrayList demoData = new ArrayList();
         String id;

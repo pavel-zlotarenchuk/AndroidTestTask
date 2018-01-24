@@ -29,10 +29,12 @@ public class InfoRoutActivity extends AppCompatActivity {
         //распарсиваем нужный нам елемент
         data = new JSONParsing().examineJSONString(route);
 
+        //initialize the fragment and the fragment manager
         //инициализируем фрагмент и фрагмент-менеджер
         FragmentManager fragmentManager = getSupportFragmentManager();
         InfoRoutFragment fragmentInfo = (InfoRoutFragment) fragmentManager.findFragmentById(R.id.fragmentInfo);
 
+        //pass the result to the fragment
         //передаем результат в фрагмент
         Bundle bundle = new Bundle();
         bundle.putString("data", data);

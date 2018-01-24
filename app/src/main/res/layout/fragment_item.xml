@@ -26,12 +26,7 @@
                 android:textSize="16sp"
                 android:visibility="visible"></TextView>
 
-            <TextView
-                android:id="@+id/android:empty"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical|center_horizontal|center"
-                android:text="@string/empty"></TextView>
+
 
             <android.support.v4.widget.SwipeRefreshLayout
                 android:id="@+id/refresh"
@@ -49,6 +44,13 @@
 
 
                 </ListView>
+
+                <TextView
+                    android:id="@+id/android:empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical|center_horizontal|center"
+                    android:text="@string/empty"></TextView>
 
             </android.support.v4.widget.SwipeRefreshLayout>
         </LinearLayout>

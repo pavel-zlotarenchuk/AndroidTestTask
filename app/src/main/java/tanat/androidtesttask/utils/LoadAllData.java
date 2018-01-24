@@ -55,20 +55,24 @@ public class LoadAllData {
 
     public String loadInetData (){
         String result = null;
-//        result = MainActivity.loadData();
+        result = MainActivity.loadData();
 
-        setsConnection();
+  /*      setsConnection();
         if (bound) {
             result = conectService.getInetJsonStr();
-        }
+        }*/
 
         return result;
     }
 
+    public ArrayList returnArray (){
+        return new JSONParsing().examineJSONDemoString(loadLocalData());
+    }
 
     private Intent intent;
     private ServiceConnection sConnection;
 
+    //биндинг сервиса
     private void setsConnection (){
         sConnection = new ServiceConnection() {
             public void onServiceConnected(ComponentName className, IBinder service) {
@@ -84,7 +88,6 @@ public class LoadAllData {
 
         intent = new Intent(context, ConectService.class);
         context.bindService(intent, sConnection, Context.BIND_AUTO_CREATE);
-        bound = true;
         context.startService(intent);
     }
 }
