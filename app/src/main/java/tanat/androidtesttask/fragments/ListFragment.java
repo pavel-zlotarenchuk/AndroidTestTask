@@ -1,21 +1,15 @@
 package tanat.androidtesttask.fragments;
 
 import android.app.DialogFragment;
-import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,12 +19,9 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 import tanat.androidtesttask.activity.InfoRoutActivity;
 import tanat.androidtesttask.R;
-import tanat.androidtesttask.service.ConectService;
-import tanat.androidtesttask.service.TestService;
 import tanat.androidtesttask.utils.LoadAllData;
 
 public class ListFragment extends android.app.ListFragment implements SwipeRefreshLayout.OnRefreshListener{
@@ -87,6 +78,7 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         startActivity(intent);
     }
 
+    // переменная в которую будем записывать сколько раз загружали данные в ListFragment
     int numberOfDownloads = 0;
 
     //свайп вниз для обновления

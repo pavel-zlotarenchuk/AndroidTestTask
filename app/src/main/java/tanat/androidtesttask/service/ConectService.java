@@ -26,16 +26,6 @@ public class ConectService extends Service {
         return binder;
     }
 
-    public void onCreate() {
-        super.onCreate();
-        Log.d(LOG_TAG, "onCreate");
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG, "onDestroy");
-    }
-
     private static String inetJsonStr = "";
 
     public int onStartCommand(Intent intent, int flags, int startId) {
