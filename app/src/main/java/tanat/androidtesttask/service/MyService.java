@@ -27,7 +27,7 @@ public class MyService extends Service {
     public String someTask() {
         new GetTask().execute();
         try {
-            Thread.sleep(500);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

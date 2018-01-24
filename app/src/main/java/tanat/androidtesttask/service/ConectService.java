@@ -19,6 +19,7 @@ public class ConectService extends Service {
 
     final String LOG_TAG = "MyLog";
     private static Context context;
+    private final IBinder binder = new LocalBinder();
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -30,7 +31,11 @@ public class ConectService extends Service {
         Log.d(LOG_TAG, "onCreate");
     }
 
-    private final IBinder binder = new LocalBinder();
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(LOG_TAG, "onDestroy");
+    }
+
     private static String inetJsonStr = "";
 
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -39,30 +44,14 @@ public class ConectService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG, "onDestroy");
-    }
-
     public void someTask() {
         GetTask getTask = new GetTask();
         getTask.execute();
-        try {
-            inetJsonStr = getTask.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
     }
 
+    /** method for clients */
     public String getInetJsonStr() {
-        if (inetJsonStr.equals("")){
-
-            return null;
-        } else {
-            return inetJsonStr;
-        }
+        return inetJsonStr;
     }
 
     public class LocalBinder extends Binder {
@@ -105,7 +94,9 @@ public class ConectService extends Service {
                 Log.d(LOG_TAG, strJson);
             }
 
-            return strJson;
+            inetJsonStr = strJson;
+
+            return null;
         }
     }
 }

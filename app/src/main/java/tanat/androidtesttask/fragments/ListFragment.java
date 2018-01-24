@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -27,7 +28,6 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 
 import tanat.androidtesttask.activity.InfoRoutActivity;
-import tanat.androidtesttask.activity.MainActivity;
 import tanat.androidtesttask.R;
 import tanat.androidtesttask.service.ConectService;
 import tanat.androidtesttask.service.TestService;
@@ -102,51 +102,54 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
 
          /*либо используем наш класс, для этого нужно его раскоментить и заменить true на false в
          * строке выше 'mSwipeRefreshLayout.setRefreshing(false);' */
-
-    //    dialogFragment.show(getFragmentManager(), "");
+//
+        dialogFragment.show(getFragmentManager(), "");
 
         // вызываем загрузку данных
 //     data = new MainActivity().demo();
 
-        LoadAllData loadAllData = new LoadAllData(getActivity());
-        data = loadAllData.loadDemoData(getActivity(), numberOfDownloads);
 
-        numberOfDownloads++;
-
-        if(data.size() > 0){
-            // данные для списка есть
-            // теперь проверим правильно ли была выполнена сетевая операция
-            if(data.get(0).toString().equals("false")){
-                // сетевая операция не прошла
-                // меняем видимость layout так, что б не было видно рабочего layout и был виден
-                // layout ошибки и вводим текст ошибки в textView
-                contentLayout.setVisibility(View.INVISIBLE);
-                errorLayout.setVisibility(View.VISIBLE);
-                errorTextView.setText(data.get(1).toString());
-            } else {
-                //если сетевая операция прошла успешно
-                errorLayout.setVisibility(View.INVISIBLE);
-                contentLayout.setVisibility(View.VISIBLE);
-                // создаем список
-                createdList();
-            }
-        } else {
-            //если данных списка нету
-            errorLayout.setVisibility(View.INVISIBLE);
-            contentLayout.setVisibility(View.VISIBLE);
-            // создаем список (ListFragment автоматически выведет заданое сообщение)
-            createdList();
-        }
 
         // прячем прогресс
         swipeRefreshLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
+
+                LoadAllData loadAllData = new LoadAllData(getActivity());
+                data = loadAllData.loadDemoData(numberOfDownloads);
+
+                numberOfDownloads++;
+
+                if(data.size() > 0){
+                    // данные для списка есть
+                    // теперь проверим правильно ли была выполнена сетевая операция
+                    if(data.get(0).toString().equals("false")){
+                        // сетевая операция не прошла
+                        // меняем видимость layout так, что б не было видно рабочего layout и был виден
+                        // layout ошибки и вводим текст ошибки в textView
+                        contentLayout.setVisibility(View.INVISIBLE);
+                        errorLayout.setVisibility(View.VISIBLE);
+                        errorTextView.setText(data.get(1).toString());
+                    } else {
+                        //если сетевая операция прошла успешно
+                        errorLayout.setVisibility(View.INVISIBLE);
+                        contentLayout.setVisibility(View.VISIBLE);
+                        // создаем список
+                        createdList();
+                    }
+                } else {
+                    //если данных списка нету
+                    errorLayout.setVisibility(View.INVISIBLE);
+                    contentLayout.setVisibility(View.VISIBLE);
+                    // создаем список (ListFragment автоматически выведет заданое сообщение)
+                    createdList();
+                }
+
                 swipeRefreshLayout.setRefreshing(false);
                 //либо используем наш класс
-        //        dialogFragment.dismiss();
+                dialogFragment.dismiss();
             }
-        }, 300);
+        }, 0);
     }
 
     private ArrayAdapter<String> adapter;
