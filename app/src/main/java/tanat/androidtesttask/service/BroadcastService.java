@@ -6,6 +6,8 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -91,9 +93,10 @@ public class BroadcastService extends Service {
                 Log.d(LOG_TAG, "strJson not null");
                 strJson = buffer.toString();
             } catch (Exception e) {
-                e.printStackTrace();
+        //        e.printStackTrace();
                 strJson = e.getMessage();
-                Log.d(LOG_TAG, strJson);
+        //        Log.d(LOG_TAG, strJson);
+                FirebaseCrash.report(e);
             }
 
             ArrayList data = new JSONParsing().examineJSONDemoString(strJson);

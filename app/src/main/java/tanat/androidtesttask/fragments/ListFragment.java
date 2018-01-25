@@ -17,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -52,7 +54,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     private final static String PARAM_STATUS = "status";
     public final static String BROADCAST_ACTION = "tanat.androidtesttask.activity";
     private BroadcastReceiver broadcastReceiver;
-    private ArrayList data = null;
 
     //connect my fragment
     //подключаем мой фрагмент
@@ -71,6 +72,7 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     }
 
     Intent intent;
+    private ArrayList data = null;
 
     private void setsConnection (){
         // create BroadcastReceiver
@@ -82,12 +84,14 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
                 // catch messages about the start of task
                 // ловим сообщения о старте задач
                 if (status == STATUS_START) {
-                    Log.d(LOG_TAG, "start task");
+        //            Log.d(LOG_TAG, "start task");
+                    FirebaseCrash.log("server start task");
                 }
                 // catch messages about the finish of task
                 // Ловим сообщения об окончании задач
                 if (status == STATUS_FINISH) {
-                    Log.d(LOG_TAG, "finish task");
+        //            Log.d(LOG_TAG, "finish task");
+                    FirebaseCrash.log("server finish task");
                     data = intent.getStringArrayListExtra(PARAM_RESULT);
                     procesShowData();
                 }
@@ -100,7 +104,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         //register BroadcastReceiver
         // регистрируем (включаем) BroadcastReceiver
         getActivity().registerReceiver(broadcastReceiver, intFilt);
-        getActivity().startService(intent);
     }
 
     @Override
@@ -113,9 +116,10 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //save data in file
-        loadLocalData.writeFile(new JSONParsing().dispatch());
-
+        if(data != null && !data.get(0).toString().equals("false")) {
+            //save data in file
+            loadLocalData.writeFile(new JSONParsing().dispatch());
+        }
         //deregister BroadcastReceiver
         // дерегистрируем (выключаем) BroadcastReceiver
         getActivity().unregisterReceiver(broadcastReceiver);
@@ -129,6 +133,8 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+        // save data in file
+        loadLocalData.writeFile(new JSONParsing().dispatch());
 
         //передаем позицию елемента в второе активити
         //создаем интент
@@ -152,7 +158,7 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         getActivity().startService(intent);
     }
 
-    LoadLocalData loadLocalData;
+    private LoadLocalData loadLocalData;
 
     // method for loading data
     // метод для загрузки данных
@@ -167,7 +173,9 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
 
         //if there is no data, load it from the network
         //если данных нет - загружаем из сети
-        if (data == null || data.size() == 0) {
+        if (data == null || data.size() == 0 || data.get(0).toString().equals("false")) {
+            data = null;
+    //        onRefresh();
             getActivity().startService(intent);
         }
     }
@@ -206,8 +214,9 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
             // создаем список (ListFragment автоматически выведет заданое сообщение)
             createdList();
         }
-
-        swipeRefreshLayout.setRefreshing(false);
+        if (data != null) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
     }
 
     private ArrayAdapter<String> adapter;
