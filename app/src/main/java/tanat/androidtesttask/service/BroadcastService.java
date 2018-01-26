@@ -4,7 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
+import tanat.androidtesttask.errorreporter.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import tanat.androidtesttask.BuildConfig;
 import tanat.androidtesttask.fragments.ListFragment;
 import tanat.androidtesttask.utils.JSONParsing;
 
@@ -28,23 +29,14 @@ public class BroadcastService extends Service {
         return null;
     }
 
-    final String LOG_TAG = "MyLog";
     ExecutorService executorService;
 
     public void onCreate() {
         super.onCreate();
-        Log.d(LOG_TAG, "Service onCreate");
         executorService = Executors.newFixedThreadPool(1);
     }
 
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG, "Service onDestroy");
-    }
-
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        Log.d(LOG_TAG, "Service onStartCommand");
 
         Run stream = new Run();
         executorService.execute(stream);
@@ -90,12 +82,11 @@ public class BroadcastService extends Service {
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line);
                 }
-                Log.d(LOG_TAG, "strJson not null");
                 strJson = buffer.toString();
             } catch (Exception e) {
         //        e.printStackTrace();
                 strJson = e.getMessage();
-        //        Log.d(LOG_TAG, strJson);
+                if (BuildConfig.USE_LOG) {Log.d(e.getMessage());}
                 FirebaseCrash.report(e);
             }
 

@@ -8,14 +8,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.crash.FirebaseCrash;
 
@@ -25,11 +27,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import tanat.androidtesttask.BuildConfig;
 import tanat.androidtesttask.activity.InfoRoutActivity;
 import tanat.androidtesttask.R;
+import tanat.androidtesttask.activity.MainActivity;
+import tanat.androidtesttask.errorreporter.GetLogs;
 import tanat.androidtesttask.service.BroadcastService;
 import tanat.androidtesttask.utils.JSONParsing;
 import tanat.androidtesttask.utils.LoadLocalData;
+import tanat.androidtesttask.errorreporter.Log;
 
 public class ListFragment extends android.app.ListFragment implements SwipeRefreshLayout.OnRefreshListener{
 
@@ -47,7 +53,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
 
     private View rootView;
 
-    final String LOG_TAG = "MyLog";
     private final static int STATUS_START = 100;
     private final static int STATUS_FINISH = 200;
     private final static String PARAM_RESULT = "result";
@@ -71,6 +76,8 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         return rootView;
     }
 
+    public String LOG_FILE_NAME = "logs";
+
     Intent intent;
     private ArrayList data = null;
 
@@ -84,14 +91,15 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
                 // catch messages about the start of task
                 // ловим сообщения о старте задач
                 if (status == STATUS_START) {
-        //            Log.d(LOG_TAG, "start task");
+                    if (BuildConfig.USE_LOG) {Log.d("server start task");}
                     FirebaseCrash.log("server start task");
                 }
                 // catch messages about the finish of task
                 // Ловим сообщения об окончании задач
                 if (status == STATUS_FINISH) {
-        //            Log.d(LOG_TAG, "finish task");
+                    if (BuildConfig.USE_LOG) {Log.d("server finish task");}
                     FirebaseCrash.log("server finish task");
+
                     data = intent.getStringArrayListExtra(PARAM_RESULT);
                     procesShowData();
                 }
@@ -113,20 +121,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         procesShowData();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if(data != null && !data.get(0).toString().equals("false")) {
-            //save data in file
-            loadLocalData.writeFile(new JSONParsing().dispatch());
-        }
-        //deregister BroadcastReceiver
-        // дерегистрируем (выключаем) BroadcastReceiver
-        getActivity().unregisterReceiver(broadcastReceiver);
-        //stop service
-        getActivity().stopService(intent);
-    }
-
     //hang the listener on the click of the fragment
     //вешаем слушатель на нажатие итема фрагмента
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -134,7 +128,7 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         // save data in file
-        loadLocalData.writeFile(new JSONParsing().dispatch());
+        loadLocalData.writeFile(FILE_NAME, new JSONParsing().dispatch());
 
         //передаем позицию елемента в второе активити
         //создаем интент
@@ -160,6 +154,7 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
 
     private LoadLocalData loadLocalData;
 
+    public String FILE_NAME = "JsonTestTask";
     // method for loading data
     // метод для загрузки данных
     private void loadData (){
@@ -169,7 +164,7 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         // upload local data
         // загрузить локальные данные
         loadLocalData = new LoadLocalData(getActivity());
-        data = loadLocalData.returnArray();
+        data = loadLocalData.returnArray(FILE_NAME);
 
         //if there is no data, load it from the network
         //если данных нет - загружаем из сети
@@ -231,5 +226,19 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
             adapter = null;
         }
         setListAdapter(adapter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(data != null && !data.get(0).toString().equals("false")) {
+            //save data in file
+            loadLocalData.writeFile(FILE_NAME, new JSONParsing().dispatch());
+        }
+        //deregister BroadcastReceiver
+        // дерегистрируем (выключаем) BroadcastReceiver
+        getActivity().unregisterReceiver(broadcastReceiver);
+        //stop service
+        getActivity().stopService(intent);
     }
 }

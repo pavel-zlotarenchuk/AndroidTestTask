@@ -8,4 +8,16 @@
     <string name="loading">Подождите,\nидёт загрузка маршрутов</string>
     <string name="refreshButton">Повторить</string>
     <string name="error_text">Ошибка!</string>
+
+    <string name="send_logs">Отправить логи</string>
+    <string name="save_logs">Сохранить логи</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+    <string name="permission_not_received">Разрешение не получено, логи не записаны!</string>
+    <string name="logs_save">Logs are recorded</string>
+
+    <string name="action_settings">Settings</string>
 </resources>
