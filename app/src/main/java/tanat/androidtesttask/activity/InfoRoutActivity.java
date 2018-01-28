@@ -21,21 +21,17 @@ public class InfoRoutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_info_rout);
 
         //unload a position from intent
-        //выгружаем позицию из интента
         Intent intent = getIntent();
         int route = intent.getIntExtra("position", 0);
 
         //parse the required element to us
-        //распарсиваем нужный нам елемент
         data = new JSONParsing().examineJSONString(route);
 
         //initialize the fragment and the fragment manager
-        //инициализируем фрагмент и фрагмент-менеджер
         FragmentManager fragmentManager = getSupportFragmentManager();
         InfoRoutFragment fragmentInfo = (InfoRoutFragment) fragmentManager.findFragmentById(R.id.fragmentInfo);
 
         //pass the result to the fragment
-        //передаем результат в фрагмент
         Bundle bundle = new Bundle();
         bundle.putString("data", data);
         fragmentInfo.setArguments(bundle);
