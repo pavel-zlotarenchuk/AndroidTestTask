@@ -40,7 +40,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     @BindView(R.id.errorTextView) TextView errorTextView;
 
     //button to update if an error
-    //кнопка для обновления в случае ошибки
     @OnClick(R.id.refreshButton)
     void onRefreshClick() {
         onRefresh();
@@ -56,7 +55,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     private BroadcastReceiver broadcastReceiver;
 
     //connect my fragment
-    //подключаем мой фрагмент
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -79,17 +77,14 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         // create BroadcastReceiver
         broadcastReceiver = new BroadcastReceiver() {
             // actions when receiving messages
-            // действия при получении сообщений
             public void onReceive(Context context, Intent intent) {
                 int status = intent.getIntExtra(PARAM_STATUS, 0);
                 // catch messages about the start of task
-                // ловим сообщения о старте задач
                 if (status == STATUS_START) {
                     if (BuildConfig.USE_LOG) {Log.d("server start task");}
                     FirebaseCrash.log("server start task");
                 }
                 // catch messages about the finish of task
-                // Ловим сообщения об окончании задач
                 if (status == STATUS_FINISH) {
                     if (BuildConfig.USE_LOG) {Log.d("server finish task");}
                     FirebaseCrash.log("server finish task");
@@ -100,11 +95,9 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
             }
         };
         // create filter BroadcastReceiver
-        // создаем фильтр для BroadcastReceiver
         IntentFilter intFilt = new IntentFilter(BROADCAST_ACTION);
 
         //register BroadcastReceiver
-        // регистрируем (включаем) BroadcastReceiver
         getActivity().registerReceiver(broadcastReceiver, intFilt);
     }
 
@@ -118,7 +111,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     @Override
     public void onPause(){
         // save the data so that you do not load it again when return to the fragment
-        // сохраняем данные что б не загружать их снова по возвращению в фрагмент
         if(data != null && !data.get(0).toString().equals("false")) {
             //save data in file
             loadLocalData.writeFile(FILE_NAME, new JSONParsing().dispatch());
@@ -129,7 +121,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     @Override
     public void onDestroy() {
         //deregister BroadcastReceiver
-        // дерегистрируем (выключаем) BroadcastReceiver
         getActivity().unregisterReceiver(broadcastReceiver);
         //stop service
         getActivity().stopService(intent);
@@ -137,7 +128,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     }
 
     //hang the listener on the click of the fragment
-    //вешаем слушатель на нажатие итема фрагмента
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
@@ -145,43 +135,33 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         // save data in file
         loadLocalData.writeFile(FILE_NAME, new JSONParsing().dispatch());
 
-        //передаем позицию елемента в второе активити
-        //создаем интент
         Intent intent = new Intent(ListFragment.this.getContext(), InfoRoutActivity.class);
-        //записываем в него ключ и позицию
         intent.putExtra("position", position);
-        //передаем
         startActivity(intent);
     }
 
     // swipe down for updates
-    // свайп вниз для обновления
     @Override
     public void onRefresh() {
         // start show progress dialog
-        // начинаем показывать прогресс диалог
         swipeRefreshLayout.setRefreshing(true);
 
         // updates data
-        // обновляем данные
         getActivity().startService(intent);
     }
 
     private LoadLocalData loadLocalData;
     private String FILE_NAME = "JsonTestTask";
     // loading data
-    // загрузка данных
     private void loadData (){
         // start show progress dialog
         swipeRefreshLayout.setRefreshing(true);
 
         // upload local data
-        // загрузить локальные данные
         loadLocalData = new LoadLocalData(getActivity());
         data = loadLocalData.returnArray(FILE_NAME);
 
         //if there is no data, load it from the network
-        //если данных нет - загружаем из сети
         if (data == null || data.size() == 0 || data.get(0).toString().equals("false")) {
             data = null;
     //        onRefresh();
@@ -193,34 +173,25 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         if(data != null){
             /* data for the list is
              * now we will check whether the network operation was performed correctly*/
-            /* данные для списка есть
-             * теперь проверим правильно ли была выполнена сетевая операция*/
             if(data.get(0).toString().equals("false")){
                 /* network operation failed
                  * change the visibility layout so that the working layout was not visible and was visible
                  * error layout and enter the error text in textView*/
-                /* сетевая операция не прошла
-                 * меняем видимость layout так, что б не было видно рабочего layout и был виден
-                 * layout ошибки и вводим текст ошибки в textView */
                 contentLayout.setVisibility(View.INVISIBLE);
                 errorLayout.setVisibility(View.VISIBLE);
                 errorTextView.setText(data.get(1).toString());
             } else {
                 // if network operation true
-                //если сетевая операция прошла успешно
                 errorLayout.setVisibility(View.INVISIBLE);
                 contentLayout.setVisibility(View.VISIBLE);
                 // create list
-                // создаем список
                 createdList();
             }
         } else {
             // if data is null
-            //если данных списка нету
             errorLayout.setVisibility(View.INVISIBLE);
             contentLayout.setVisibility(View.VISIBLE);
             // create list (ListFragment automatically outputs the specified message)
-            // создаем список (ListFragment автоматически выведет заданое сообщение)
             createdList();
         }
         if (data != null) {
@@ -231,7 +202,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     private ArrayAdapter<String> adapter;
 
     // create list
-    // создание списка
     public void createdList(){
         if (data != null){
             adapter = new ArrayAdapter<String>(getActivity(),
