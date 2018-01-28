@@ -54,19 +54,16 @@ public class BroadcastService extends Service {
             Intent intent = new Intent(ListFragment.BROADCAST_ACTION);
 
             // inform about the start of the task
-            // сообщаем о старте задачи
             intent.putExtra(PARAM_STATUS, STATUS_START);
             sendBroadcast(intent);
 
             // start task
-            // начинаем выполнение задачи
             String strJson = "";
             InputStream inputStream;
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
             // Get the data from an external resource and re-do it on the line
-            // получаем данные с внешнего ресурса и переделываем в строку
             try {
                 URL url = new URL("http://projects.gmoby.org/web/index.php/api/trips?from_date=2016-01-01&to_date=2018-03-01");
 
@@ -84,7 +81,7 @@ public class BroadcastService extends Service {
                 }
                 strJson = buffer.toString();
             } catch (Exception e) {
-        //        e.printStackTrace();
+                e.printStackTrace();
                 strJson = e.getMessage();
                 if (BuildConfig.USE_LOG) {Log.d(e.getMessage());}
                 FirebaseCrash.report(e);
@@ -93,7 +90,6 @@ public class BroadcastService extends Service {
             ArrayList data = new JSONParsing().examineJSONDemoString(strJson);
 
             // inform about the finish of the task
-            // сообщаем об окончании задачи
             intent.putExtra(PARAM_STATUS, STATUS_FINISH);
             intent.putExtra(PARAM_RESULT, data);
             sendBroadcast(intent);
