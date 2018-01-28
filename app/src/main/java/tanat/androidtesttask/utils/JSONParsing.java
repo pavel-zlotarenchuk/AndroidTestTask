@@ -9,14 +9,12 @@ public class JSONParsing {
 
     private static String jsonString;
 
-    // method that would parse the string
-    // метод что б распарсить строку
+    // parse the string
     public String examineJSONString(int sch){
             String x = "";
         try
         {
             // the entire string is an object {}
-            // вся строка это объект {}
             JSONObject post = new JSONObject(jsonString);
             JSONArray arrayData = post.getJSONArray("data");
 
@@ -24,7 +22,6 @@ public class JSONParsing {
             {
                 x = "Подробная информация по маршруту №";
                 // Data is already a list []
-                // Data это уже список []
                 JSONObject jsonArrayRoute= new JSONObject(arrayData.getString(i));
                 x += jsonArrayRoute.getString("id") + "\n\n";
 
@@ -63,8 +60,7 @@ public class JSONParsing {
         }
     }
 
-    // method that parsed 5 values
-    // метод что б распарсить 5 значений
+    // parsed 5 values
     public ArrayList examineJSONDemoString(String jsontext){
         if (jsontext == null){
             return null;
@@ -107,7 +103,6 @@ public class JSONParsing {
     }
 
     // method for returning a string
-    // метод для возврата строки
     public String dispatch (){
         return jsonString;
     }
