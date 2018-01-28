@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "824147327147-esmbqv9s2m9me1i99f84ul11udmi5fp7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "tanat.androidtesttask",
+            "certificate_hash": "809c875c28c44560dc9bb9363d0ff63c12ea5888"
+          }
+        },
+        {
           "client_id": "824147327147-518ka7jqopl9lb5pllkc8kf9ohvkiq4m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

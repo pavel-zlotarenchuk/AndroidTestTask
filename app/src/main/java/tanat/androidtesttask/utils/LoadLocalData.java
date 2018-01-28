@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
+import tanat.androidtesttask.BuildConfig;
 import tanat.androidtesttask.errorreporter.Log;
 
 public class LoadLocalData {
@@ -28,7 +29,7 @@ public class LoadLocalData {
     // переменная в которой записано название файла что представляет собой локальную строку json
 
 
-    //method save string in file
+    // save string in file
     //метод для сохранение строки json в файл (создание локальной базы)
     public void writeFile(String fileName, String answer) {
         try {
@@ -38,6 +39,7 @@ public class LoadLocalData {
             bw.write(answer);
             // close stream (закрываем поток)
             bw.close();
+            if (BuildConfig.USE_LOG) {Log.d("JSON string save on memory device");}
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -45,7 +47,7 @@ public class LoadLocalData {
         }
     }
 
-    //method read string from a file
+    // read string from a file
     // метод для чтения строки json из файла
     public static String readFile(String fileName) {
         String str = "";
@@ -54,6 +56,7 @@ public class LoadLocalData {
             BufferedReader br = new BufferedReader(new InputStreamReader(context.openFileInput(fileName)));
             // read file (читаем содержимое)
             str = br.readLine();
+            if (BuildConfig.USE_LOG) {Log.d("JSON string read with memory device");}
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -62,66 +65,49 @@ public class LoadLocalData {
         return str;
     }
 
+    // returning a list
     public ArrayList returnArray (String fileName){
         return new JSONParsing().examineJSONDemoString(readFile(fileName));
     }
 
-    private String DIR_SD = "/Android/data/androidtesttask/logs";
+    // path to the file directory
+    private String DIR_SD = "/Android/data/androidtesttask/logs/";
 
+    // writing to SD
     public void writeFileSD(String fileName, String logsStr) {
-        // проверяем доступность SD
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+        //we get the path to SD
             // получаем путь к SD
             File sdPath = Environment.getExternalStorageDirectory();
+            //add your directory to the path
             // добавляем свой каталог к пути
             sdPath = new File(sdPath.getAbsolutePath() + DIR_SD);
+            // create directory
             // создаем каталог
             sdPath.mkdirs();
+            // create file in directory
             // формируем объект File, который содержит путь к файлу
             File sdFile = new File(sdPath, fileName);
             try {
-                // открываем поток для записи
                 BufferedWriter bw = new BufferedWriter(new FileWriter(sdFile));
-                // пишем данные
                 bw.write(logsStr);
-                // закрываем поток
                 bw.close();
-                Log.d("File save on SD: " + sdFile.getAbsolutePath());
+                if (BuildConfig.USE_LOG) {Log.d("File save on SD: " + sdFile.getAbsolutePath());}
             } catch (IOException e) {
-                Log.d(e.getMessage());
+                e.printStackTrace();
             }
-        } else {
-            writeFile(fileName, logsStr);
-            Log.d("SD card not available, file save on mobile storage");
-        }
     }
 
-    public String readFileSD(String fileName) {
-        String logsStr = "";
-        // проверяем доступность SD
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            // получаем путь к SD
-            File sdPath = Environment.getExternalStorageDirectory();
-            // добавляем свой каталог к пути
-            sdPath = new File(sdPath.getAbsolutePath() + "/" + DIR_SD);
-            // формируем объект File, который содержит путь к файлу
-            File sdFile = new File(sdPath, fileName);
-            try {
-                // открываем поток для чтения
-                BufferedReader br = new BufferedReader(new FileReader(sdFile));
-                // читаем содержимое
-                while ((logsStr = br.readLine()) != null) {
-                    logsStr = logsStr + "\n";
-                }
-                return logsStr;
-            } catch (FileNotFoundException e) {
-                logsStr = logsStr + e.getMessage();
-            } catch (IOException e) {
-                logsStr = logsStr + e.getMessage();
-            }
-        } else {
-            logsStr = readFile(fileName);
+    // checking for a file
+    public Boolean existFile (String fileName){
+        File sdPath = Environment.getExternalStorageDirectory();
+        sdPath = new File(sdPath.getAbsolutePath() + DIR_SD);
+        File sdFile = new File(sdPath, fileName);
+
+        if (sdFile.exists()){
+            if (BuildConfig.USE_LOG) {Log.d("File exists");}
+            return true;
         }
-        return logsStr;
+        if (BuildConfig.USE_LOG) {Log.d("File not exists");}
+        return false;
     }
 }

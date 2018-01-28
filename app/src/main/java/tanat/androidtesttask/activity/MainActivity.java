@@ -9,8 +9,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -20,6 +18,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import tanat.androidtesttask.R;
 import tanat.androidtesttask.errorreporter.GetLogs;
 import tanat.androidtesttask.utils.LoadLocalData;
+import tanat.androidtesttask.utils.SendEMail;
 
 public class MainActivity extends Activity {
 
@@ -44,53 +43,74 @@ public class MainActivity extends Activity {
     }
 
     public String LOG_FILE_NAME = "logs";
+    LoadLocalData loadSD = new LoadLocalData(MainActivity.this);
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String action = "";
 
         int i = item.getItemId();
-        if (i == R.id.save_logs) {
-            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                if (isCheckPermission()) {
-                    LoadLocalData loadSD = new LoadLocalData(MainActivity.this);
-                    loadSD.writeFileSD(LOG_FILE_NAME, GetLogs.get());
-                    action = "logs save";
-                } else {
-                    action = String.valueOf(R.string.permission_not_received);
+        // Check the availability of the SD card
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+
+            if (i == R.id.save_logs) {
+                if (isCheckPermission(1)) {
+                    saveLogs();
+                }
+            } else if (i == R.id.send_logs) {
+                if (isCheckPermission(2)) {
+                    if (!loadSD.existFile(LOG_FILE_NAME)) {
+                        saveLogs();
+                    }
+                    new SendEMail(MainActivity.this).send(LOG_FILE_NAME);
                 }
             }
-
-        } else if (i == R.id.send_logs) {
-
+        } else {
+            Toast.makeText(this, "Insert a memory card", Toast.LENGTH_SHORT).show();
         }
-
-        Toast.makeText(this, action, Toast.LENGTH_SHORT).show();
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean isCheckPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
-                PackageManager.PERMISSION_GRANTED) {
+    private Boolean sendMail = false;
 
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                showMessageOKCancel("Do you want to save logs");
+    private boolean isCheckPermission(int i) {
+        if (i == 1) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                    PackageManager.PERMISSION_GRANTED) {
+
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    showMessageOKCancel("Requires write permission to save logs to file");
+                    return false;
+                }
+
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        PERMISSIONS_REQUEST);
+
+                return false;
+                // MY_PERMISSIONS_REQUEST is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+            return true;
+        } else if (i == 2) {
+            //
+            sendMail = true;
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) !=
+                    PackageManager.PERMISSION_GRANTED) {
+
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    showMessageOKCancel("Requires read permission to transfer file");
+                    return false;
+                }
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                        PERMISSIONS_REQUEST);
                 return false;
             }
-
-            // No explanation needed, we can request the permission.
-
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    PERMISSIONS_REQUEST);
-
-            return false;
-            // MY_PERMISSIONS_REQUEST is an
-            // app-defined int constant. The callback method gets the
-            // result of the request.
+            return true;
         }
-
-        return true;
+        return false;
     }
 
     private void showMessageOKCancel(String message) {
@@ -120,7 +140,9 @@ public class MainActivity extends Activity {
                 case BUTTON_POSITIVE:
                     // int which = -1
                     ActivityCompat.requestPermissions(
-                            MainActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            MainActivity.this, new String[]{
+                                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                    android.Manifest.permission.READ_EXTERNAL_STORAGE},
                             PERMISSIONS_REQUEST);
                     dialog.dismiss();
                     break;
@@ -129,35 +151,26 @@ public class MainActivity extends Activity {
     };
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST){
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                saveLogs();
+                if (sendMail) {
+                    new SendEMail(MainActivity.this).send(LOG_FILE_NAME);
+                    sendMail = false;
                 }
-                return;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request.
         }
+    }
+
+    public void saveLogs (){
+        loadSD.writeFileSD(LOG_FILE_NAME, GetLogs.get());
+        Toast.makeText(this, "Logs save", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onDestroy() {
-        Log.d("MyLog","ТЕСТ ТЕСТ TEST TEST ТЕСТ ТЕСТ TEST TEST ТЕСТ ТЕСТ TEST TEST");
-        Log.d("Logs","Logs: " + GetLogs.get());
-
+        loadSD.writeFileSD(LOG_FILE_NAME, GetLogs.get());
         super.onDestroy();
     }
 }

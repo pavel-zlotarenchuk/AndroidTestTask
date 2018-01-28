@@ -9,15 +9,12 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.crash.FirebaseCrash;
 
@@ -30,8 +27,6 @@ import butterknife.OnClick;
 import tanat.androidtesttask.BuildConfig;
 import tanat.androidtesttask.activity.InfoRoutActivity;
 import tanat.androidtesttask.R;
-import tanat.androidtesttask.activity.MainActivity;
-import tanat.androidtesttask.errorreporter.GetLogs;
 import tanat.androidtesttask.service.BroadcastService;
 import tanat.androidtesttask.utils.JSONParsing;
 import tanat.androidtesttask.utils.LoadLocalData;
@@ -73,10 +68,9 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         intent = new Intent(getActivity(), BroadcastService.class);
         setsConnection();
 
+        setRetainInstance(true);
         return rootView;
     }
-
-    public String LOG_FILE_NAME = "logs";
 
     Intent intent;
     private ArrayList data = null;
@@ -121,6 +115,27 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         procesShowData();
     }
 
+    @Override
+    public void onPause(){
+        // save the data so that you do not load it again when return to the fragment
+        // сохраняем данные что б не загружать их снова по возвращению в фрагмент
+        if(data != null && !data.get(0).toString().equals("false")) {
+            //save data in file
+            loadLocalData.writeFile(FILE_NAME, new JSONParsing().dispatch());
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        //deregister BroadcastReceiver
+        // дерегистрируем (выключаем) BroadcastReceiver
+        getActivity().unregisterReceiver(broadcastReceiver);
+        //stop service
+        getActivity().stopService(intent);
+        super.onDestroy();
+    }
+
     //hang the listener on the click of the fragment
     //вешаем слушатель на нажатие итема фрагмента
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -140,7 +155,7 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     }
 
     // swipe down for updates
-    //свайп вниз для обновления
+    // свайп вниз для обновления
     @Override
     public void onRefresh() {
         // start show progress dialog
@@ -153,10 +168,9 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     }
 
     private LoadLocalData loadLocalData;
-
-    public String FILE_NAME = "JsonTestTask";
-    // method for loading data
-    // метод для загрузки данных
+    private String FILE_NAME = "JsonTestTask";
+    // loading data
+    // загрузка данных
     private void loadData (){
         // start show progress dialog
         swipeRefreshLayout.setRefreshing(true);
@@ -216,8 +230,8 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
 
     private ArrayAdapter<String> adapter;
 
-    // method create list
-    // метод создание списка
+    // create list
+    // создание списка
     public void createdList(){
         if (data != null){
             adapter = new ArrayAdapter<String>(getActivity(),
@@ -226,19 +240,5 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
             adapter = null;
         }
         setListAdapter(adapter);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if(data != null && !data.get(0).toString().equals("false")) {
-            //save data in file
-            loadLocalData.writeFile(FILE_NAME, new JSONParsing().dispatch());
-        }
-        //deregister BroadcastReceiver
-        // дерегистрируем (выключаем) BroadcastReceiver
-        getActivity().unregisterReceiver(broadcastReceiver);
-        //stop service
-        getActivity().stopService(intent);
     }
 }

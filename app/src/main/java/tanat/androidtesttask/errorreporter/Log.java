@@ -22,7 +22,7 @@ public final class Log {
                 if (found) {
                     if (!trace.getClassName().startsWith(className)) {
                         Class<?> clazz = Class.forName(trace.getClassName());
-                        return "[" + getClassName(clazz) + ":" + trace.getMethodName() + ":" + trace.getLineNumber() + "]: ";
+                        return "[" + getClassName(clazz) + ":" + trace.getMethodName() + "]: ";
                     }
                 }
                 else if (trace.getClassName().startsWith(className)) {
