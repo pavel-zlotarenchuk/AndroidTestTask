@@ -29,7 +29,6 @@ public class InfoRoutFragment extends Fragment {
         super.onStart();
 
         //check for emptiness
-        //проверяем на пустоту
         if (getArguments() != null) {
             //add data in TextViev
             String data = getArguments().getString("data");
