@@ -5,6 +5,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import tanat.androidtesttask.BuildConfig;
+import tanat.androidtesttask.errorreporter.Log;
+
 public class JSONParsing {
 
     private static String jsonString;
@@ -100,6 +103,52 @@ public class JSONParsing {
             demoData.add(jsonString);
         }
         return demoData;
+    }
+
+    public ArrayList<String[]> examineJSONObj(){
+        ArrayList<String[]> arrayList = new ArrayList<String[]>();
+        try
+        {
+            JSONObject post = new JSONObject(jsonString);
+            JSONArray arrayData = post.getJSONArray("data");
+
+            for (int i = 0; i <= arrayData.length(); i++)
+            {
+                String[] row = new String[17];
+                JSONObject jsonArrayRoute = new JSONObject(arrayData.getString(i));
+                row[0] = jsonArrayRoute.getString("id");
+
+                JSONObject jsonArrayFromCity = jsonArrayRoute.getJSONObject("from_city");
+                row[1] = jsonArrayFromCity.getString("name");
+                row[2] = jsonArrayFromCity.getString("highlight");
+                row[3] = jsonArrayFromCity.getString("id");
+
+                JSONObject jsonArrayToCity = jsonArrayRoute.getJSONObject("to_city");
+                row[4] = jsonArrayToCity.getString("name");
+                row[5] = jsonArrayToCity.getString("highlight");
+                row[6] = jsonArrayToCity.getString("id");
+
+                row[7] = jsonArrayRoute.getString("info");
+
+                row[8] = jsonArrayRoute.getString("from_date");
+                row[9] = jsonArrayRoute.getString("from_time");
+                row[10] = jsonArrayRoute.getString("from_info");
+
+                row[11] = jsonArrayRoute.getString("to_date");
+                row[12] = jsonArrayRoute.getString("to_time");
+                row[13] = jsonArrayRoute.getString("to_info");
+
+                row[14] = jsonArrayRoute.getString("price");
+                row[15] = jsonArrayRoute.getString("bus_id");
+                row[16] = jsonArrayRoute.getString("reservation_count");
+
+                arrayList.add(row);
+            }
+        }
+        catch (Exception je) {
+            if (BuildConfig.USE_LOG) {Log.d(je.getMessage());}
+        }
+        return arrayList;
     }
 
     // method for returning a string

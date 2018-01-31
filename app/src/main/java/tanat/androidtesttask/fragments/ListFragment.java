@@ -1,9 +1,12 @@
 package tanat.androidtesttask.fragments;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -27,6 +30,7 @@ import butterknife.OnClick;
 import tanat.androidtesttask.BuildConfig;
 import tanat.androidtesttask.activity.InfoRoutActivity;
 import tanat.androidtesttask.R;
+import tanat.androidtesttask.database.DBHelper;
 import tanat.androidtesttask.service.BroadcastService;
 import tanat.androidtesttask.utils.JSONParsing;
 import tanat.androidtesttask.utils.LoadLocalData;
@@ -54,6 +58,8 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     public final static String BROADCAST_ACTION = "tanat.androidtesttask.activity";
     private BroadcastReceiver broadcastReceiver;
 
+    DBHelper dbHelper;
+
     //connect my fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,12 +72,15 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         intent = new Intent(getActivity(), BroadcastService.class);
         setsConnection();
 
+        dbHelper = new DBHelper(getActivity());
+
         setRetainInstance(true);
         return rootView;
     }
 
     Intent intent;
     private ArrayList data = null;
+    public int numLoad = 0;
 
     private void setsConnection (){
         // create BroadcastReceiver
@@ -91,6 +100,10 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
 
                     data = intent.getStringArrayListExtra(PARAM_RESULT);
                     procesShowData();
+
+                    CacheData cacheData = new CacheData();
+                    cacheData.execute();
+                    numLoad++;
                 }
             }
         };
@@ -164,7 +177,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         //if there is no data, load it from the network
         if (data == null || data.size() == 0 || data.get(0).toString().equals("false")) {
             data = null;
-    //        onRefresh();
             getActivity().startService(intent);
         }
     }
@@ -210,5 +222,48 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
             adapter = null;
         }
         setListAdapter(adapter);
+    }
+
+    // Caching the query in the database
+    class CacheData extends AsyncTask<Void, Void, Void> {
+
+                @Override
+        protected Void doInBackground(Void... params) {
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            ArrayList<String[]> arrayList = new JSONParsing().examineJSONObj();
+
+            db.delete(dbHelper.TABLE_NAME, null, null);
+            if (BuildConfig.USE_LOG) {Log.d("Size: " + arrayList.size());}
+            for (int i = 0; i < arrayList.size(); i++){
+                values.put(dbHelper.ID, arrayList.get(i)[0]);
+                values.put(dbHelper.NAME_FROM_CITY, arrayList.get(i)[1]);
+                values.put(dbHelper.HIGHLIGHT_FROM_CITY, arrayList.get(i)[2]);
+                values.put(dbHelper.ID_FROM_CITY, arrayList.get(i)[3]);
+                values.put(dbHelper.NAME_TO_CITY, arrayList.get(i)[4]);
+                values.put(dbHelper.HIGHLIGHT_TO_CITY, arrayList.get(i)[5]);
+                values.put(dbHelper.ID_TO_CITY, arrayList.get(i)[6]);
+                values.put(dbHelper.INFO, arrayList.get(i)[7]);
+                values.put(dbHelper.FROM_DATE, arrayList.get(i)[8]);
+                values.put(dbHelper.FROM_TIME, arrayList.get(i)[9]);
+                values.put(DBHelper.FROM_INFO, arrayList.get(i)[10]);
+                values.put(DBHelper.TO_DATE, arrayList.get(i)[11]);
+                values.put(dbHelper.TO_TIME, arrayList.get(i)[12]);
+                values.put(dbHelper.TO_INFO, arrayList.get(i)[13]);
+                values.put(dbHelper.PRICE, arrayList.get(i)[14]);
+                values.put(dbHelper.BUS_ID, arrayList.get(i)[15]);
+                values.put(dbHelper.RESERVATION_COUNT, arrayList.get(i)[16]);
+
+                db.insert(dbHelper.TABLE_NAME, null, values);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            if (BuildConfig.USE_LOG) {Log.d("The cache is written to the database");}
+            super.onPostExecute(result);
+        }
     }
 }
