@@ -28,15 +28,12 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import io.realm.Realm;
-import io.realm.RealmAsyncTask;
-import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 import tanat.androidtesttask.BuildConfig;
 import tanat.androidtesttask.activity.InfoRoutActivity;
 import tanat.androidtesttask.R;
 import tanat.androidtesttask.activity.MainActivity;
 import tanat.androidtesttask.database.DBHelper;
-import tanat.androidtesttask.database.RealmController;
 import tanat.androidtesttask.model.RealmModel;
 import tanat.androidtesttask.service.BroadcastService;
 import tanat.androidtesttask.utils.JSONParsing;
@@ -135,11 +132,9 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     public void onPause(){
         // save the data so that you do not load it again when return to the fragment
         if(data != null && !data.get(0).toString().equals("false")) {
-            if (BuildConfig.USE_LOG) {Log.d("pause do save");}
             //save data in file
-            loadLocalData.writeFile(FILE_NAME, new JSONParsing().dispatch());
+            new LoadLocalData(getActivity()).writeFile(FILE_NAME, new JSONParsing().dispatch());
         }
-        if (BuildConfig.USE_LOG) {Log.d("pause last save");}
         super.onPause();
     }
 
@@ -238,7 +233,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         int checkTypeDatabase = new MainActivity().checkTypeDatabase;
         if (checkTypeDatabase == 1) {
             // use Realm database
-//            cacheRealm();
             CacheRealm cacheRealm = new CacheRealm();
             cacheRealm.execute();
 
@@ -280,15 +274,19 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         protected Void doInBackground(Void... params) {
             ArrayList<String[]> arrayList = new JSONParsing().examineJSONObj();
 
+            // Get a Realm instance for this thread
             Realm realm = Realm.getDefaultInstance();
 
             try {
-            realm.beginTransaction();
+                // open realm transaction
+                realm.beginTransaction();
 
-            RealmResults<RealmModel> results = realm.where(RealmModel.class).findAll();
-            results.deleteAllFromRealm();
+                // clear realm from
+                RealmResults<RealmModel> results = realm.where(RealmModel.class).findAll();
+                results.deleteAllFromRealm();
 
             for (int i = 0; i < arrayList.size(); i++) {
+                // create realm model
                 RealmModel realmObject = realm.createObject(RealmModel.class);
 
                 realmObject.setId(Integer.valueOf(arrayList.get(i)[id]));
@@ -316,9 +314,11 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
                 realmObject.setReservation_count(Integer.valueOf(arrayList.get(i)[reservation_count]));
             }
 
+            // close realm transaction
             realm.commitTransaction();
 
             } finally {
+                // close realm
                 realm.close();
             }
             return null;
@@ -336,12 +336,17 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
 
         @Override
         protected Void doInBackground(Void... params) {
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-            ContentValues values = new ContentValues();
             ArrayList<String[]> arrayList = new JSONParsing().examineJSONObj();
 
+            // create db exemplar SQLiteDatabase
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+            // create values exemplar ContentValues
+            ContentValues values = new ContentValues();
+
+            // clear table
             db.delete(dbHelper.TABLE_NAME, null, null);
+
             for (int i = 0; i < arrayList.size(); i++){
                 values.put(dbHelper.ID, arrayList.get(i)[id]);
                 values.put(dbHelper.NAME_FROM_CITY, arrayList.get(i)[name_from_city]);
@@ -361,6 +366,7 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
                 values.put(dbHelper.BUS_ID, arrayList.get(i)[bus_id]);
                 values.put(dbHelper.RESERVATION_COUNT, arrayList.get(i)[reservation_count]);
 
+                // insert values in table
                 db.insert(dbHelper.TABLE_NAME, null, values);
             }
             return null;
