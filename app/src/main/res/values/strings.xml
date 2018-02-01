@@ -9,8 +9,11 @@
     <string name="refreshButton">Повторить</string>
     <string name="error_text">Ошибка!</string>
 
+    <!-- TODO: Menu -->
     <string name="send_logs">Отправить логи</string>
     <string name="save_logs">Сохранить логи</string>
+    <string name="sqlite_database">SQLite</string>
+    <string name="realm_database">Realm</string>
 
     <string name="email_developer">pavel.zlotarenchuk@gmail.com</string>
 </resources>

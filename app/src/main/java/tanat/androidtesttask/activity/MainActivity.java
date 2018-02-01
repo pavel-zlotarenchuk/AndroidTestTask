@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,8 +16,10 @@ import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import tanat.androidtesttask.BuildConfig;
 import tanat.androidtesttask.R;
 import tanat.androidtesttask.errorreporter.GetLogs;
+import tanat.androidtesttask.errorreporter.Log;
 import tanat.androidtesttask.utils.LoadLocalData;
 import tanat.androidtesttask.utils.SendEMail;
 
@@ -44,6 +47,7 @@ public class MainActivity extends Activity {
 
     public String LOG_FILE_NAME = "logs";
     LoadLocalData loadSD = new LoadLocalData(MainActivity.this);
+    public static int checkTypeDatabase = 1;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -67,6 +71,15 @@ public class MainActivity extends Activity {
         } else {
             Toast.makeText(this, "Insert a memory card", Toast.LENGTH_SHORT).show();
         }
+
+        if (i == R.id.realm_database){
+            checkTypeDatabase = 1;
+            item.setChecked(true);
+        } else if (i == R.id.sqlite_database){
+            checkTypeDatabase = 2;
+            item.setChecked(true);
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -151,7 +164,8 @@ public class MainActivity extends Activity {
     };
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
         if (requestCode == PERMISSIONS_REQUEST){
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 saveLogs();

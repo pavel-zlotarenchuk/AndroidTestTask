@@ -27,10 +27,17 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import io.realm.Realm;
+import io.realm.RealmAsyncTask;
+import io.realm.RealmConfiguration;
+import io.realm.RealmResults;
 import tanat.androidtesttask.BuildConfig;
 import tanat.androidtesttask.activity.InfoRoutActivity;
 import tanat.androidtesttask.R;
+import tanat.androidtesttask.activity.MainActivity;
 import tanat.androidtesttask.database.DBHelper;
+import tanat.androidtesttask.database.RealmController;
+import tanat.androidtesttask.model.RealmModel;
 import tanat.androidtesttask.service.BroadcastService;
 import tanat.androidtesttask.utils.JSONParsing;
 import tanat.androidtesttask.utils.LoadLocalData;
@@ -58,7 +65,9 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     public final static String BROADCAST_ACTION = "tanat.androidtesttask.activity";
     private BroadcastReceiver broadcastReceiver;
 
+    private LoadLocalData loadLocalData;
     DBHelper dbHelper;
+    Realm realm;
 
     //connect my fragment
     @Override
@@ -72,7 +81,11 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         intent = new Intent(getActivity(), BroadcastService.class);
         setsConnection();
 
+        loadLocalData = new LoadLocalData(getActivity());
+
         dbHelper = new DBHelper(getActivity());
+
+        Realm.init(getActivity());
 
         setRetainInstance(true);
         return rootView;
@@ -80,7 +93,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
 
     Intent intent;
     private ArrayList data = null;
-    public int numLoad = 0;
 
     private void setsConnection (){
         // create BroadcastReceiver
@@ -101,9 +113,7 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
                     data = intent.getStringArrayListExtra(PARAM_RESULT);
                     procesShowData();
 
-                    CacheData cacheData = new CacheData();
-                    cacheData.execute();
-                    numLoad++;
+                    saveCache();
                 }
             }
         };
@@ -125,9 +135,11 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     public void onPause(){
         // save the data so that you do not load it again when return to the fragment
         if(data != null && !data.get(0).toString().equals("false")) {
+            if (BuildConfig.USE_LOG) {Log.d("pause do save");}
             //save data in file
             loadLocalData.writeFile(FILE_NAME, new JSONParsing().dispatch());
         }
+        if (BuildConfig.USE_LOG) {Log.d("pause last save");}
         super.onPause();
     }
 
@@ -163,7 +175,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         getActivity().startService(intent);
     }
 
-    private LoadLocalData loadLocalData;
     private String FILE_NAME = "JsonTestTask";
     // loading data
     private void loadData (){
@@ -171,7 +182,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         swipeRefreshLayout.setRefreshing(true);
 
         // upload local data
-        loadLocalData = new LoadLocalData(getActivity());
         data = loadLocalData.returnArray(FILE_NAME);
 
         //if there is no data, load it from the network
@@ -224,10 +234,107 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         setListAdapter(adapter);
     }
 
-    // Caching the query in the database
-    class CacheData extends AsyncTask<Void, Void, Void> {
+    public void saveCache (){
+        int checkTypeDatabase = new MainActivity().checkTypeDatabase;
+        if (checkTypeDatabase == 1) {
+            // use Realm database
+//            cacheRealm();
+            CacheRealm cacheRealm = new CacheRealm();
+            cacheRealm.execute();
 
-                @Override
+        } else if (checkTypeDatabase == 2) {
+            // use SQLite database
+            CacheSQLite cacheSQLite = new CacheSQLite();
+            cacheSQLite.execute();
+        }
+    }
+
+    private int id = 0;
+
+    private int name_from_city = 1;
+    private int highlight_from_city = 2;
+    private int id_from_city = 3;
+
+    private int name_to_city = 4;
+    private int highlight_to_city = 5;
+    private int id_to_city = 6;
+
+    private int info = 7;
+
+    private int from_date = 8;
+    private int from_time = 9;
+    private int from_info = 10;
+
+    private int to_date = 11;
+    private int to_time = 12;
+    private int to_info = 13;
+
+    private int price = 14;
+    private int bus_id = 15;
+    private int reservation_count = 16;
+
+    // Caching the query in the Realm database
+    class CacheRealm extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ArrayList<String[]> arrayList = new JSONParsing().examineJSONObj();
+
+            Realm realm = Realm.getDefaultInstance();
+
+            try {
+            realm.beginTransaction();
+
+            RealmResults<RealmModel> results = realm.where(RealmModel.class).findAll();
+            results.deleteAllFromRealm();
+
+            for (int i = 0; i < arrayList.size(); i++) {
+                RealmModel realmObject = realm.createObject(RealmModel.class);
+
+                realmObject.setId(Integer.valueOf(arrayList.get(i)[id]));
+
+                realmObject.setName_from_city(arrayList.get(i)[name_from_city]);
+                realmObject.setHighlight_from_city(arrayList.get(i)[highlight_from_city]);
+                realmObject.setId_from_city(Integer.valueOf(arrayList.get(i)[id_from_city]));
+
+                realmObject.setName_to_city(arrayList.get(i)[name_to_city]);
+                realmObject.setHighlight_to_city(arrayList.get(i)[highlight_to_city]);
+                realmObject.setId_to_city(Integer.valueOf(arrayList.get(i)[id_to_city]));
+
+                realmObject.setInfo(arrayList.get(i)[info]);
+
+                realmObject.setFrom_date(arrayList.get(i)[from_date]);
+                realmObject.setFrom_time(arrayList.get(i)[from_time]);
+                realmObject.setFrom_info(arrayList.get(i)[from_info]);
+
+                realmObject.setTo_date(arrayList.get(i)[to_date]);
+                realmObject.setTo_time(arrayList.get(i)[to_time]);
+                realmObject.setTo_info(arrayList.get(i)[to_info]);
+
+                realmObject.setPrice(Integer.valueOf(arrayList.get(i)[price]));
+                realmObject.setBus_id(Integer.valueOf(arrayList.get(i)[bus_id]));
+                realmObject.setReservation_count(Integer.valueOf(arrayList.get(i)[reservation_count]));
+            }
+
+            realm.commitTransaction();
+
+            } finally {
+                realm.close();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            if (BuildConfig.USE_LOG) {Log.d("The cache is written to the Realm database");}
+            super.onPostExecute(result);
+        }
+    }
+
+    // Caching the query in the SQLite database
+    class CacheSQLite extends AsyncTask<Void, Void, Void> {
+
+        @Override
         protected Void doInBackground(Void... params) {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -235,25 +342,24 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
             ArrayList<String[]> arrayList = new JSONParsing().examineJSONObj();
 
             db.delete(dbHelper.TABLE_NAME, null, null);
-            if (BuildConfig.USE_LOG) {Log.d("Size: " + arrayList.size());}
             for (int i = 0; i < arrayList.size(); i++){
-                values.put(dbHelper.ID, arrayList.get(i)[0]);
-                values.put(dbHelper.NAME_FROM_CITY, arrayList.get(i)[1]);
-                values.put(dbHelper.HIGHLIGHT_FROM_CITY, arrayList.get(i)[2]);
-                values.put(dbHelper.ID_FROM_CITY, arrayList.get(i)[3]);
-                values.put(dbHelper.NAME_TO_CITY, arrayList.get(i)[4]);
-                values.put(dbHelper.HIGHLIGHT_TO_CITY, arrayList.get(i)[5]);
-                values.put(dbHelper.ID_TO_CITY, arrayList.get(i)[6]);
-                values.put(dbHelper.INFO, arrayList.get(i)[7]);
-                values.put(dbHelper.FROM_DATE, arrayList.get(i)[8]);
-                values.put(dbHelper.FROM_TIME, arrayList.get(i)[9]);
-                values.put(DBHelper.FROM_INFO, arrayList.get(i)[10]);
-                values.put(DBHelper.TO_DATE, arrayList.get(i)[11]);
-                values.put(dbHelper.TO_TIME, arrayList.get(i)[12]);
-                values.put(dbHelper.TO_INFO, arrayList.get(i)[13]);
-                values.put(dbHelper.PRICE, arrayList.get(i)[14]);
-                values.put(dbHelper.BUS_ID, arrayList.get(i)[15]);
-                values.put(dbHelper.RESERVATION_COUNT, arrayList.get(i)[16]);
+                values.put(dbHelper.ID, arrayList.get(i)[id]);
+                values.put(dbHelper.NAME_FROM_CITY, arrayList.get(i)[name_from_city]);
+                values.put(dbHelper.HIGHLIGHT_FROM_CITY, arrayList.get(i)[highlight_from_city]);
+                values.put(dbHelper.ID_FROM_CITY, arrayList.get(i)[id_from_city]);
+                values.put(dbHelper.NAME_TO_CITY, arrayList.get(i)[name_to_city]);
+                values.put(dbHelper.HIGHLIGHT_TO_CITY, arrayList.get(i)[highlight_to_city]);
+                values.put(dbHelper.ID_TO_CITY, arrayList.get(i)[id_to_city]);
+                values.put(dbHelper.INFO, arrayList.get(i)[info]);
+                values.put(dbHelper.FROM_DATE, arrayList.get(i)[from_date]);
+                values.put(dbHelper.FROM_TIME, arrayList.get(i)[from_time]);
+                values.put(DBHelper.FROM_INFO, arrayList.get(i)[from_info]);
+                values.put(DBHelper.TO_DATE, arrayList.get(i)[to_date]);
+                values.put(dbHelper.TO_TIME, arrayList.get(i)[to_time]);
+                values.put(dbHelper.TO_INFO, arrayList.get(i)[to_info]);
+                values.put(dbHelper.PRICE, arrayList.get(i)[price]);
+                values.put(dbHelper.BUS_ID, arrayList.get(i)[bus_id]);
+                values.put(dbHelper.RESERVATION_COUNT, arrayList.get(i)[reservation_count]);
 
                 db.insert(dbHelper.TABLE_NAME, null, values);
             }
@@ -262,7 +368,7 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
 
         @Override
         protected void onPostExecute(Void result) {
-            if (BuildConfig.USE_LOG) {Log.d("The cache is written to the database");}
+            if (BuildConfig.USE_LOG) {Log.d("The cache is written to the SQLite database");}
             super.onPostExecute(result);
         }
     }
