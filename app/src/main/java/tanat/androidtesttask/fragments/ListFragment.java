@@ -152,8 +152,6 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        // save data in file
-        loadLocalData.writeFile(FILE_NAME, new JSONParsing().dispatch());
 
         Intent intent = new Intent(ListFragment.this.getContext(), InfoRoutActivity.class);
         intent.putExtra("position", position);
