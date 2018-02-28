@@ -19,33 +19,34 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.firebase.crash.FirebaseCrash;
-
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-
 import io.realm.Realm;
 import io.realm.RealmResults;
 import tanat.androidtesttask.BuildConfig;
-import tanat.androidtesttask.activity.InfoRoutActivity;
 import tanat.androidtesttask.R;
+import tanat.androidtesttask.activity.InfoRoutActivity;
 import tanat.androidtesttask.activity.MainActivity;
 import tanat.androidtesttask.database.DBHelper;
+import tanat.androidtesttask.errorreporter.Log;
 import tanat.androidtesttask.model.RealmModel;
 import tanat.androidtesttask.service.BroadcastService;
 import tanat.androidtesttask.utils.JSONParsing;
 import tanat.androidtesttask.utils.LoadLocalData;
-import tanat.androidtesttask.errorreporter.Log;
 
-public class ListFragment extends android.app.ListFragment implements SwipeRefreshLayout.OnRefreshListener{
+public class ListFragment extends android.app.ListFragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    @BindView(R.id.refresh) SwipeRefreshLayout swipeRefreshLayout;
-    @BindView(R.id.standart_layout) LinearLayout contentLayout;
-    @BindView(R.id.error_layout) LinearLayout errorLayout;
-    @BindView(R.id.errorTextView) TextView errorTextView;
+    @BindView(R.id.refresh)
+    SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.standart_layout)
+    LinearLayout contentLayout;
+    @BindView(R.id.error_layout)
+    LinearLayout errorLayout;
+    @BindView(R.id.errorTextView)
+    TextView errorTextView;
 
     //button to update if an error
     @OnClick(R.id.refreshButton)
@@ -91,7 +92,7 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     Intent intent;
     private ArrayList data = null;
 
-    private void setsConnection (){
+    private void setsConnection() {
         // create BroadcastReceiver
         broadcastReceiver = new BroadcastReceiver() {
             // actions when receiving messages
@@ -99,13 +100,15 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
                 int status = intent.getIntExtra(PARAM_STATUS, 0);
                 // catch messages about the start of task
                 if (status == STATUS_START) {
-                    if (BuildConfig.USE_LOG) {Log.d("server start task");}
-                    FirebaseCrash.log("server start task");
+                    if (BuildConfig.USE_LOG) {
+                        Log.d("server start task");
+                    }
                 }
                 // catch messages about the finish of task
                 if (status == STATUS_FINISH) {
-                    if (BuildConfig.USE_LOG) {Log.d("server finish task");}
-                    FirebaseCrash.log("server finish task");
+                    if (BuildConfig.USE_LOG) {
+                        Log.d("server finish task");
+                    }
 
                     data = intent.getStringArrayListExtra(PARAM_RESULT);
                     procesShowData();
@@ -129,9 +132,9 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         // save the data so that you do not load it again when return to the fragment
-        if(data != null && !data.get(0).toString().equals("false")) {
+        if (data != null && !data.get(0).toString().equals("false")) {
             //save data in file
             new LoadLocalData(getActivity()).writeFile(FILE_NAME, new JSONParsing().dispatch());
         }
@@ -169,8 +172,9 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     }
 
     private String FILE_NAME = "JsonTestTask";
+
     // loading data
-    private void loadData (){
+    private void loadData() {
         // start show progress dialog
         swipeRefreshLayout.setRefreshing(true);
 
@@ -184,11 +188,11 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         }
     }
 
-    private void procesShowData (){
-        if(data != null){
+    private void procesShowData() {
+        if (data != null) {
             /* data for the list is
              * now we will check whether the network operation was performed correctly*/
-            if(data.get(0).toString().equals("false")){
+            if (data.get(0).toString().equals("false")) {
                 /* network operation failed
                  * change the visibility layout so that the working layout was not visible and was visible
                  * error layout and enter the error text in textView*/
@@ -217,8 +221,8 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
     private ArrayAdapter<String> adapter;
 
     // create list
-    public void createdList(){
-        if (data != null){
+    public void createdList() {
+        if (data != null) {
             adapter = new ArrayAdapter<String>(getActivity(),
                     android.R.layout.simple_list_item_1, data);
         } else {
@@ -227,7 +231,7 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
         setListAdapter(adapter);
     }
 
-    public void saveCache (){
+    public void saveCache() {
         int checkTypeDatabase = new MainActivity().checkTypeDatabase;
         if (checkTypeDatabase == 1) {
             // use Realm database
@@ -283,37 +287,37 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
                 RealmResults<RealmModel> results = realm.where(RealmModel.class).findAll();
                 results.deleteAllFromRealm();
 
-            for (int i = 0; i < arrayList.size(); i++) {
-                // create realm model
-                RealmModel realmObject = realm.createObject(RealmModel.class);
+                for (int i = 0; i < arrayList.size(); i++) {
+                    // create realm model
+                    RealmModel realmObject = realm.createObject(RealmModel.class);
 
-                realmObject.setId(Integer.valueOf(arrayList.get(i)[id]));
+                    realmObject.setId(Integer.valueOf(arrayList.get(i)[id]));
 
-                realmObject.setName_from_city(arrayList.get(i)[name_from_city]);
-                realmObject.setHighlight_from_city(arrayList.get(i)[highlight_from_city]);
-                realmObject.setId_from_city(Integer.valueOf(arrayList.get(i)[id_from_city]));
+                    realmObject.setName_from_city(arrayList.get(i)[name_from_city]);
+                    realmObject.setHighlight_from_city(arrayList.get(i)[highlight_from_city]);
+                    realmObject.setId_from_city(Integer.valueOf(arrayList.get(i)[id_from_city]));
 
-                realmObject.setName_to_city(arrayList.get(i)[name_to_city]);
-                realmObject.setHighlight_to_city(arrayList.get(i)[highlight_to_city]);
-                realmObject.setId_to_city(Integer.valueOf(arrayList.get(i)[id_to_city]));
+                    realmObject.setName_to_city(arrayList.get(i)[name_to_city]);
+                    realmObject.setHighlight_to_city(arrayList.get(i)[highlight_to_city]);
+                    realmObject.setId_to_city(Integer.valueOf(arrayList.get(i)[id_to_city]));
 
-                realmObject.setInfo(arrayList.get(i)[info]);
+                    realmObject.setInfo(arrayList.get(i)[info]);
 
-                realmObject.setFrom_date(arrayList.get(i)[from_date]);
-                realmObject.setFrom_time(arrayList.get(i)[from_time]);
-                realmObject.setFrom_info(arrayList.get(i)[from_info]);
+                    realmObject.setFrom_date(arrayList.get(i)[from_date]);
+                    realmObject.setFrom_time(arrayList.get(i)[from_time]);
+                    realmObject.setFrom_info(arrayList.get(i)[from_info]);
 
-                realmObject.setTo_date(arrayList.get(i)[to_date]);
-                realmObject.setTo_time(arrayList.get(i)[to_time]);
-                realmObject.setTo_info(arrayList.get(i)[to_info]);
+                    realmObject.setTo_date(arrayList.get(i)[to_date]);
+                    realmObject.setTo_time(arrayList.get(i)[to_time]);
+                    realmObject.setTo_info(arrayList.get(i)[to_info]);
 
-                realmObject.setPrice(Integer.valueOf(arrayList.get(i)[price]));
-                realmObject.setBus_id(Integer.valueOf(arrayList.get(i)[bus_id]));
-                realmObject.setReservation_count(Integer.valueOf(arrayList.get(i)[reservation_count]));
-            }
+                    realmObject.setPrice(Integer.valueOf(arrayList.get(i)[price]));
+                    realmObject.setBus_id(Integer.valueOf(arrayList.get(i)[bus_id]));
+                    realmObject.setReservation_count(Integer.valueOf(arrayList.get(i)[reservation_count]));
+                }
 
-            // close realm transaction
-            realm.commitTransaction();
+                // close realm transaction
+                realm.commitTransaction();
 
             } finally {
                 // close realm
@@ -324,7 +328,9 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
 
         @Override
         protected void onPostExecute(Void result) {
-            if (BuildConfig.USE_LOG) {Log.d("The cache is written to the Realm database");}
+            if (BuildConfig.USE_LOG) {
+                Log.d("The cache is written to the Realm database");
+            }
             super.onPostExecute(result);
         }
     }
@@ -345,7 +351,7 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
             // clear table
             db.delete(dbHelper.TABLE_NAME, null, null);
 
-            for (int i = 0; i < arrayList.size(); i++){
+            for (int i = 0; i < arrayList.size(); i++) {
                 values.put(dbHelper.ID, arrayList.get(i)[id]);
                 values.put(dbHelper.NAME_FROM_CITY, arrayList.get(i)[name_from_city]);
                 values.put(dbHelper.HIGHLIGHT_FROM_CITY, arrayList.get(i)[highlight_from_city]);
@@ -372,7 +378,9 @@ public class ListFragment extends android.app.ListFragment implements SwipeRefre
 
         @Override
         protected void onPostExecute(Void result) {
-            if (BuildConfig.USE_LOG) {Log.d("The cache is written to the SQLite database");}
+            if (BuildConfig.USE_LOG) {
+                Log.d("The cache is written to the SQLite database");
+            }
             super.onPostExecute(result);
         }
     }

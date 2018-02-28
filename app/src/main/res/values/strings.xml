@@ -10,6 +10,7 @@
     <string name="error_text">Ошибка!</string>
 
     <!-- TODO: Menu -->
+    <string name="get_list">Получить список</string>
     <string name="send_logs">Отправить логи</string>
     <string name="save_logs">Сохранить логи</string>
     <string name="sqlite_database">SQLite</string>

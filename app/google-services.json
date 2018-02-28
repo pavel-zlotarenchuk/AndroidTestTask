@@ -1,43 +1,35 @@
 {
   "project_info": {
-    "project_number": "824147327147",
-    "firebase_url": "https://androintesttask.firebaseio.com",
-    "project_id": "androintesttask",
-    "storage_bucket": "androintesttask.appspot.com"
+    "project_number": "676729343513",
+    "firebase_url": "https://androirtesttasck.firebaseio.com",
+    "project_id": "androirtesttasck",
+    "storage_bucket": "androirtesttasck.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:824147327147:android:2f265fd9ae2ae693",
+        "mobilesdk_app_id": "1:676729343513:android:2f265fd9ae2ae693",
         "android_client_info": {
           "package_name": "tanat.androidtesttask"
         }
       },
       "oauth_client": [
         {
-          "client_id": "824147327147-esmbqv9s2m9me1i99f84ul11udmi5fp7.apps.googleusercontent.com",
+          "client_id": "676729343513-ipsrdqaskurpbejklr8rni4fl50inb13.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "tanat.androidtesttask",
-            "certificate_hash": "809c875c28c44560dc9bb9363d0ff63c12ea5888"
+            "certificate_hash": "cb6ceffd618e6883274f47a4babd343a72528b7d"
           }
         },
         {
-          "client_id": "824147327147-518ka7jqopl9lb5pllkc8kf9ohvkiq4m.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "tanat.androidtesttask",
-            "certificate_hash": "faabf9c37d9123e469ac0084b7d932e56ad2a81f"
-          }
-        },
-        {
-          "client_id": "824147327147-tphbh3ivdg6iauug6a1cle6i3eo2m05f.apps.googleusercontent.com",
+          "client_id": "676729343513-vce2tg8r1nr2vddt9ostf91p1evtcu1o.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyADUM6E4lNn6itb-8_QeQKLIbGypuF4dB0"
+          "current_key": "AIzaSyD6MK6xKwGRlqat0dxU-AEisINRJIdXXOk"
         }
       ],
       "services": {
@@ -48,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "824147327147-tphbh3ivdg6iauug6a1cle6i3eo2m05f.apps.googleusercontent.com",
+              "client_id": "676729343513-vce2tg8r1nr2vddt9ostf91p1evtcu1o.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

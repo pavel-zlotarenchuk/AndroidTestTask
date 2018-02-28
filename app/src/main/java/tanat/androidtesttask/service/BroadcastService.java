@@ -6,8 +6,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import tanat.androidtesttask.errorreporter.Log;
 
-import com.google.firebase.crash.FirebaseCrash;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -84,7 +82,6 @@ public class BroadcastService extends Service {
                 e.printStackTrace();
                 strJson = e.getMessage();
                 if (BuildConfig.USE_LOG) {Log.d(e.getMessage());}
-                FirebaseCrash.report(e);
             }
 
             ArrayList data = new JSONParsing().examineJSONDemoString(strJson);

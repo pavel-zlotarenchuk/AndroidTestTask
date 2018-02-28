@@ -16,10 +16,8 @@ import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-import tanat.androidtesttask.BuildConfig;
 import tanat.androidtesttask.R;
 import tanat.androidtesttask.errorreporter.GetLogs;
-import tanat.androidtesttask.errorreporter.Log;
 import tanat.androidtesttask.utils.LoadLocalData;
 import tanat.androidtesttask.utils.SendEMail;
 

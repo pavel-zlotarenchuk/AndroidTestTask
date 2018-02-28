@@ -32,7 +32,7 @@
                 android:id="@+id/refresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context="tanat.androidtesttask.activity.MainActivity">
+                tools:context="tanat.androidtesttask.activity.NewMainActivity">
 
                 <ListView
                     android:id="@id/android:list"
