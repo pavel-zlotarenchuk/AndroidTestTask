@@ -17,4 +17,30 @@
     <string name="realm_database">Realm</string>
 
     <string name="email_developer">pavel.zlotarenchuk@gmail.com</string>
+    <string name="title_activity_start">StartActivity</string>
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="buy_string">Buy</string>
+    <string name="click_string">Click</string>
+
+    <string name="slogan">Using in-app purchase to make money</string>
+    <string name="download_button">CLICK TO DOWNLOAD FILE</string>
+    <string name="buy_gold">BUY GOLD FOR YOUR APP</string>
+    <string name="in_app_support">In-app purchase is not supported by your device</string>
+    <string name="main_content">Thanks for your purchase and welcome to the paid content section</string>
+
+    <!-- TODO: In App Billing -->
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Trivial Drive</string>
+
+    <string name="subscription_period_prompt">Select your subscription period</string>
+    <string name="subscription_resignup_prompt">To reactivate your subscription, select your subscription period</string>
+    <string name="subscription_update_prompt">To change your subscription, select your new subscription period</string>
+    <string name="subscription_period_monthly">Monthly</string>
+    <string name="subscription_period_yearly">Yearly</string>
+    <string name="subscription_prompt_continue">Continue</string>
+    <string name="subscription_prompt_cancel">Cancel</string>
+    <string name="content_description_app_loading_image">App loading image</string>
+    <string name="content_description_title_image">80\'s Video Game Style Car Logo</string>
+    <string name="content_desc_gas_gauge_indicator">Gas gauge indicator</string>
+    <string name="content_desc_free_vs_premium_indicator">Free or Premium Image Indicator</string>
 </resources>

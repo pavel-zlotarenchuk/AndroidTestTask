@@ -11,7 +11,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import tanat.androidtesttask.R;
-import tanat.androidtesttask.model.Contact;
 import tanat.androidtesttask.model.Data;
 
 /**
@@ -21,7 +20,7 @@ import tanat.androidtesttask.model.Data;
 public class ContactAdapter extends ArrayAdapter<Data> {
 
     List<Data> dataList;
-    Context       context;
+    Context context;
     private LayoutInflater mInflater;
 
     // Constructors
@@ -68,7 +67,7 @@ public class ContactAdapter extends ArrayAdapter<Data> {
         public TextView fromInfoTextView;
         public TextView fromPriceTextView;
 
-        private ViewHolder(ConstraintLayout rootView, TextView idTextView, TextView fromDateTextView, TextView fromTimeTextView, TextView fromInfoTextView,TextView fromPriceTextView) {
+        private ViewHolder(ConstraintLayout rootView, TextView idTextView, TextView fromDateTextView, TextView fromTimeTextView, TextView fromInfoTextView, TextView fromPriceTextView) {
             this.rootView = rootView;
             this.idTextView = idTextView;
             this.fromDateTextView = fromDateTextView;

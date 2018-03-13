@@ -6,7 +6,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
  * Created by mac on 2/27/18.
  */
 
-class FirebaseInstanceIdService extends com.google.firebase.iid.FirebaseInstanceIdService {
+public class FirebaseInstanceIdService extends com.google.firebase.iid.FirebaseInstanceIdService {
 
     @Override
     public void onTokenRefresh() {

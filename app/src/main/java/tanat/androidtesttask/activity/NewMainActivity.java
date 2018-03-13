@@ -25,19 +25,17 @@ import tanat.androidtesttask.R;
 import tanat.androidtesttask.adapter.ContactAdapter;
 import tanat.androidtesttask.api.ApiService;
 import tanat.androidtesttask.api.RetroClient;
-import tanat.androidtesttask.model.Contact;
 import tanat.androidtesttask.model.Data;
-import tanat.androidtesttask.model.DataList;
 import tanat.androidtesttask.model.PojoModel;
 import tanat.androidtesttask.utils.InternetConnection;
 
 public class NewMainActivity extends AppCompatActivity {
 
     private ListView listView;
-    private View     parentView;
+    private View parentView;
 
     private ArrayList<Data> contactList;
-    private ContactAdapter     adapter;
+    private ContactAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +90,7 @@ public class NewMainActivity extends AppCompatActivity {
                                 dialog.dismiss();
 
                                 if (response.isSuccessful()) {
-                                    List<Data> dataList =  response.body().getData();
+                                    List<Data> dataList = response.body().getData();
 
                                     //contactList = response.body().getContacts();
 
