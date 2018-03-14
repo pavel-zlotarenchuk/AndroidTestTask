@@ -18,6 +18,8 @@ public class StartActivity extends Activity {
     private Button billingInAppButton;
     private Button volleyButton;
     private Button serviceButton;
+    private Button retrofitButton;
+    private Button rxButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +36,14 @@ public class StartActivity extends Activity {
         billingInAppButton = (Button) findViewById(R.id.billingInAppButton);
         volleyButton = (Button) findViewById(R.id.volleyButton);
         serviceButton = (Button) findViewById(R.id.serviceButton);
+        retrofitButton = (Button) findViewById(R.id.retrofitButton);
+        rxButton = (Button) findViewById(R.id.rxButton);
 
         billingInAppButton.setOnClickListener(billingInAppClick);
         volleyButton.setOnClickListener(volleyListClick);
         serviceButton.setOnClickListener(serviceListClick);
+        retrofitButton.setOnClickListener(retrofitListClick);
+        rxButton.setOnClickListener(rxListClick);
     }
 
     View.OnClickListener billingInAppClick = new View.OnClickListener() {
@@ -50,14 +56,33 @@ public class StartActivity extends Activity {
     View.OnClickListener volleyListClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            startActivity(new Intent(StartActivity.this, VolleyMainActivity.class));
+            startActivity(VolleyMainActivity.class);
+        }
+    };
+
+    View.OnClickListener retrofitListClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            startActivity(RetrofitActivity.class);
+        }
+    };
+
+    View.OnClickListener rxListClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            startActivity(RxJavaActivity.class);
         }
     };
 
     View.OnClickListener serviceListClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            startActivity(new Intent(StartActivity.this, MainActivity.class));
+            startActivity(MainActivity.class);
         }
     };
+
+    private void startActivity(Class aClass) {
+        Intent intent = new Intent(this, aClass);
+        startActivity(intent);
+    }
 }

@@ -28,6 +28,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Service list" />
+
+        <Button
+            android:id="@+id/retrofitButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Retrofit" />
+
+        <Button
+            android:id="@+id/rxButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="RxJava" />
     </LinearLayout>
 
     <com.google.android.gms.ads.AdView

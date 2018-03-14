@@ -43,9 +43,13 @@
 
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.InfoRoutActivity" />
-        <activity android:name=".activity.NewMainActivity" />
+        <activity android:name=".activity.RetrofitActivity" />
         <activity android:name=".activity.VolleyMainActivity" />
-        <activity android:name=".activity.PrivateContentActivity"></activity>
+        <activity android:name=".activity.PrivateContentActivity" />
+        <activity
+            android:name=".activity.RxJavaActivity"
+            android:label="@string/title_activity_rx_java"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
